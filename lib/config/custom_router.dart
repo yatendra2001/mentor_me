@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mentor_me/screens/screens.dart';
 
 class CustomRouter {
   static Route onGenerateRoute(RouteSettings settings) {
@@ -10,6 +11,13 @@ class CustomRouter {
           settings: const RouteSettings(name: '/'),
           builder: (_) => const Scaffold(),
         );
+
+      case SplashScreen.routeName:
+        return SplashScreen.route();
+      case Onboardingpageview.routeName:
+        return Onboardingpageview.route();
+      case LoginPageView.routeName:
+        return LoginPageView.route();
       default:
         return _errorRoute();
     }
