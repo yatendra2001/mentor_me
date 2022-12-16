@@ -370,25 +370,26 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       });
       await EventRepository()
           .createEvent(
-            event: Event(
-              type: selectType,
-              paid: paid,
-              eventName: eventName.text,
-              memberIds: [SessionHelper.uid!],
-              id: null,
-              description: description.text,
-              startDate: startDate,
-              creatorId: SessionHelper.uid!,
-              endDate: endDate,
-              roomCode: code,
-              joiningAmount: paid ? int.parse(joiningAmount.text) : 0,
-            ),
-          )
-          .then((value) => flutterToast(msg: "Event Created"));
-      setState(() {
-        submitting = false;
+        event: Event(
+          type: selectType,
+          paid: paid,
+          eventName: eventName.text,
+          memberIds: [SessionHelper.uid!],
+          id: null,
+          description: description.text,
+          startDate: startDate,
+          creatorId: SessionHelper.uid!,
+          endDate: endDate,
+          roomCode: code,
+          joiningAmount: paid ? int.parse(joiningAmount.text) : 0,
+        ),
+      )
+          .then((value) {
+        setState(() {
+          submitting = false;
+        });
+        Navigator.of(context).pop();
       });
-      Navigator.of(context).pop();
     }
   }
 

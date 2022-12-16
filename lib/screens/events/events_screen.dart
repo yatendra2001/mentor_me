@@ -254,7 +254,11 @@ class _EventsScreenState extends State<EventsScreen> {
         }
       }
     }
-
+    if (state.status.name == EventStatus.loading) {
+      return Center(
+        child: CircularProgressIndicator(),
+      );
+    }
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -370,7 +374,7 @@ class EventCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final difference = event.endDate.day - event.startDate.day;
+    final difference = event.endDate.difference(DateTime.now()).inDays;
 
     return GestureDetector(
       onTap: () {
@@ -420,7 +424,7 @@ class EventCardWidget extends StatelessWidget {
                     imageBorderWidth: 0,
                   ),
                   Text(
-                    difference.toString() + " day",
+                    "$difference day",
                     style: TextStyle(
                         color: kPrimaryBlackColor.withOpacity(0.5),
                         fontSize: 12.sp,
