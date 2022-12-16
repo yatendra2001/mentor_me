@@ -5,6 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_cropper/image_cropper.dart';
+import 'package:mentor_me/repositories/storage/storage_repository.dart';
+import 'package:mentor_me/screens/screens.dart';
+import 'package:mentor_me/utils/session_helper.dart';
 import 'package:sizer/sizer.dart';
 
 import 'package:mentor_me/helpers/image_helper.dart';
@@ -95,9 +98,8 @@ class _AddProfilePhotoScreenState extends State<AddProfilePhotoScreen> {
                   onTap: () async {
                     BlocProvider.of<LoginCubit>(context)
                         .updateProfilePhoto(profileImage);
-                    widget.pageController.nextPage(
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeIn);
+                    Navigator.of(context)
+                        .pushReplacementNamed(EventsScreen.routeName);
                   },
                   isButtonNull: isButtonNotActive,
                 ),
@@ -127,6 +129,12 @@ class _AddProfilePhotoScreenState extends State<AddProfilePhotoScreen> {
     if (pickedFile != null) {
       profileImage = pickedFile;
       _profilePicChecker.text = 'done';
+      var profileImageUrl = "";
+      SessionHelper.profileImageUrl =
+          await StorageRepository().uploadProfileImage(
+        url: profileImageUrl,
+        image: pickedFile,
+      );
       // context.read<EditProfileCubit>().profileImageChanged(pickedFile);
     }
   }

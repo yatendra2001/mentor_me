@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mentor_me/blocs/blocs.dart';
+import 'package:mentor_me/screens/events/events_screen.dart';
 import 'package:mentor_me/screens/login/onboarding/onboarding_pageview.dart';
 import 'package:mentor_me/screens/login/pageview.dart';
 import 'package:mentor_me/utils/theme_constants.dart';
@@ -32,9 +33,9 @@ class SplashScreen extends StatelessWidget {
               //Go to navigation screen
               // BlocProvider.of<InitializeStreamChatCubit>(context)
               //     .initializeStreamChat(context);
-              // Navigator.of(context).pushNamed(
-              //   EventScreeb.routeName,
-              // );
+              Navigator.of(context).pushNamed(
+                EventsScreen.routeName,
+              );
               log("Authenticated");
             } else if (state.status == AuthStatus.authenticated &&
                 state.isUserExist == false) {

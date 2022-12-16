@@ -18,6 +18,8 @@ class CustomRouter {
         return Onboardingpageview.route();
       case LoginPageView.routeName:
         return LoginPageView.route();
+      case EventsScreen.routeName:
+        return EventsScreen.route();
       default:
         return _errorRoute();
     }

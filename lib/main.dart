@@ -44,13 +44,12 @@ class MyApp extends StatelessWidget {
         RepositoryProvider<UserRepository>(
           create: (_) => UserRepository(),
         ),
-        // RepositoryProvider<StorageRepository>(
-        //   create: (_) => StorageRepository(),
-        // ),
-
-        // RepositoryProvider<EventRepository>(
-        //   create: (_) => EventRepository(),
-        // ),
+        RepositoryProvider<StorageRepository>(
+          create: (_) => StorageRepository(),
+        ),
+        RepositoryProvider<EventRepository>(
+          create: (_) => EventRepository(),
+        ),
       ],
       child: MultiBlocProvider(
         providers: [

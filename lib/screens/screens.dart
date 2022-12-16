@@ -7,3 +7,5 @@ export 'login/onboarding/onboarding_pageview.dart';
 export 'login/onboarding/registration_screen.dart';
 export 'login/onboarding/username_screen.dart';
 export 'login/pageview.dart';
+export 'login/onboarding/add_profile_photo_screen.dart';
+export 'events/events_screen.dart';

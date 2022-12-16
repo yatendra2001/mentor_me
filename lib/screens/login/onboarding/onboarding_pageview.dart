@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:mentor_me/screens/login/onboarding/dob_screen.dart';
-import 'package:mentor_me/screens/login/onboarding/registration_screen.dart';
-import 'package:mentor_me/screens/login/onboarding/username_screen.dart';
 import 'package:mentor_me/screens/screens.dart';
 import 'package:mentor_me/utils/theme_constants.dart';
 
@@ -85,16 +82,10 @@ class _OnboardingpageviewState extends State<Onboardingpageview> {
       ),
       UsernameScreen(pageController: _pageController),
       DobScreen(pageController: _pageController),
-      // BlocProvider<EditProfileCubit>(
-      //   create: (context) => EditProfileCubit(
-      //     userRepository: context.read<UserRepository>(),
-      //     storageRepository: context.read<StorageRepository>(),
-      //     profileBloc: context.read<ProfileBloc>(),
-      //   ),
-      //   child: AddProfilePhotoScreen(
-      //     pageController: _pageController,
-      //   ),
-      // ),
+      AddProfilePhotoScreen(
+        pageController: _pageController,
+      ),
+
       // FollowUsersScreen()
     ];
   }
