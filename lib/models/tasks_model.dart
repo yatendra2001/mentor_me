@@ -2,15 +2,15 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 
-class TaskMode {
-  String id;
+class TaskModel {
+  String? id;
   String title;
   String description;
   List<Task> tasks;
   String url;
   String urlname;
   DateTime endDateTime;
-  TaskMode({
+  TaskModel({
     required this.id,
     required this.title,
     required this.description,
@@ -20,7 +20,7 @@ class TaskMode {
     required this.endDateTime,
   });
 
-  TaskMode copyWith({
+  TaskModel copyWith({
     String? id,
     String? title,
     String? description,
@@ -29,7 +29,7 @@ class TaskMode {
     String? urlname,
     DateTime? endDateTime,
   }) {
-    return TaskMode(
+    return TaskModel(
       id: id ?? this.id,
       title: title ?? this.title,
       description: description ?? this.description,
@@ -52,8 +52,8 @@ class TaskMode {
     };
   }
 
-  factory TaskMode.fromMap(Map<String, dynamic> map) {
-    return TaskMode(
+  factory TaskModel.fromMap(Map<String, dynamic> map) {
+    return TaskModel(
       id: map['id'] ?? '',
       title: map['title'] ?? '',
       description: map['description'] ?? '',
@@ -66,19 +66,19 @@ class TaskMode {
 
   String toJson() => json.encode(toMap());
 
-  factory TaskMode.fromJson(String source) =>
-      TaskMode.fromMap(json.decode(source));
+  factory TaskModel.fromJson(String source) =>
+      TaskModel.fromMap(json.decode(source));
 
   @override
   String toString() {
-    return 'TaskMode(id: $id, title: $title, description: $description, tasks: $tasks, url: $url, urlname: $urlname, endDateTime: $endDateTime)';
+    return 'TaskModel(id: $id, title: $title, description: $description, tasks: $tasks, url: $url, urlname: $urlname, endDateTime: $endDateTime)';
   }
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is TaskMode &&
+    return other is TaskModel &&
         other.id == id &&
         other.title == title &&
         other.description == description &&
@@ -133,6 +133,8 @@ class Task {
       imageName: imageName ?? this.imageName,
     );
   }
+
+
 
   Map<String, dynamic> toMap() {
     return {
