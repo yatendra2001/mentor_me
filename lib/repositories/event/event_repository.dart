@@ -15,15 +15,19 @@ class EventRepository extends BaseEventRepository {
     return Event.fromMap(event.data()!, eventId);
   }
 
-  Future<void> createEvent({required Event event}) async {
-    final refId =
-        await _firebaseFirestore.collection(Paths.events).add(event.toMap());
+  Future<void> myEvents({required Event event, required refId}) async {
     await _firebaseFirestore
         .collection(Paths.usersEvents)
         .doc(event.creatorId)
         .collection(Paths.userEvent)
         .doc(refId.id)
         .set({});
+  }
+
+  Future<void> createEvent({required Event event}) async {
+    final refId =
+        await _firebaseFirestore.collection(Paths.events).add(event.toMap());
+    await myEvents(event: event, refId: refId);
   }
 
   Future<List<Event>> getUserEvents({required String userId}) async {
