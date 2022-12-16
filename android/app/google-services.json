@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "959980274177",
+    "project_id": "mentorme-8e9da",
+    "storage_bucket": "mentorme-8e9da.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:959980274177:android:57d52a10b9a0adbc73b600",
+        "android_client_info": {
+          "package_name": "com.superawesomeapps.mentor_me"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "959980274177-cebim3mhd435dc60islkbu3f1datdl33.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.superawesomeapps.mentor_me",
+            "certificate_hash": "38e593323cea5d47e19408b8b453740c19b748a3"
+          }
+        },
+        {
+          "client_id": "959980274177-u79obu7tr2jgcck68no730434qieonjh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCsVENwCZQkvKd7cdOnbI0Z-1bFJCYFclY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "959980274177-u79obu7tr2jgcck68no730434qieonjh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
