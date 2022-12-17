@@ -345,7 +345,7 @@ class _BuildTaskState extends State<BuildTask> {
                   .doc(widget.modelId)
                   .collection("leaderboard")
                   .doc(SessionHelper.uid)
-                  .set({"points": FieldValue.increment(-10)}).then((value) {
+                  .update({"points": FieldValue.increment(-10)}).then((value) {
                 isCompleted = !isCompleted;
                 setState(() {});
               });
