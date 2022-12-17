@@ -51,6 +51,7 @@ class EventRoomTaskScreen extends StatefulWidget {
 class _EventRoomTaskScreenState extends State<EventRoomTaskScreen> {
   Task empty() {
     return Task(
+        id: "",
         title: "",
         detail: "",
         urlname: "",
@@ -71,6 +72,16 @@ class _EventRoomTaskScreenState extends State<EventRoomTaskScreen> {
   final urlnameController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool isSubmitting = false;
+
+  Future<void> fun(DocumentReference ref) async {
+    for (var task in tasks) {
+      await FirebaseFirestore.instance
+          .collection("Tasks")
+          .doc(ref.id)
+          .collection("Assigned Tasks")
+          .add(task.toMap());
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -110,7 +121,6 @@ class _EventRoomTaskScreenState extends State<EventRoomTaskScreen> {
                       id: null,
                       title: titleController.text,
                       description: descriptionController.text,
-                      tasks: tasks,
                       url: urlController.text,
                       urlname: urlnameController.text,
                       endDateTime: DateTime.now(),
@@ -118,14 +128,16 @@ class _EventRoomTaskScreenState extends State<EventRoomTaskScreen> {
                     await FirebaseFirestore.instance
                         .collection("events")
                         .doc(widget.eventId)
-                        .collection("Tasks")
+                        .collection("TaskPost")
                         .add(taskModel.toMap())
-                        .then((value) {
-                      isSubmitting = false;
+                        .then((value) async {
+                      await fun(value).then((value) {
+                        isSubmitting = false;
 
-                      setState(() {});
+                        setState(() {});
 
-                      Navigator.of(context).pop();
+                        Navigator.of(context).pop();
+                      });
                     });
                   }
 
@@ -317,6 +329,10 @@ class _BuildTaskCardState extends State<BuildTaskCard> {
   final urlController = TextEditingController();
   final imageNameController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

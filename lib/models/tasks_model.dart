@@ -6,15 +6,13 @@ class TaskModel {
   String? id;
   String title;
   String description;
-  List<Task> tasks;
   String url;
   String urlname;
   DateTime endDateTime;
   TaskModel({
-    required this.id,
+    this.id,
     required this.title,
     required this.description,
-    required this.tasks,
     required this.url,
     required this.urlname,
     required this.endDateTime,
@@ -24,7 +22,6 @@ class TaskModel {
     String? id,
     String? title,
     String? description,
-    List<Task>? tasks,
     String? url,
     String? urlname,
     DateTime? endDateTime,
@@ -33,7 +30,6 @@ class TaskModel {
       id: id ?? this.id,
       title: title ?? this.title,
       description: description ?? this.description,
-      tasks: tasks ?? this.tasks,
       url: url ?? this.url,
       urlname: urlname ?? this.urlname,
       endDateTime: endDateTime ?? this.endDateTime,
@@ -45,33 +41,26 @@ class TaskModel {
       'id': id,
       'title': title,
       'description': description,
-      'tasks': tasks.map((x) => x.toMap()).toList(),
       'url': url,
       'urlname': urlname,
       'endDateTime': endDateTime.millisecondsSinceEpoch,
     };
   }
 
-  factory TaskModel.fromMap(Map<String, dynamic> map) {
+  factory TaskModel.fromMap(Map<String, dynamic> map, String id) {
     return TaskModel(
-      id: map['id'] ?? '',
+      id: id,
       title: map['title'] ?? '',
       description: map['description'] ?? '',
-      tasks: List<Task>.from(map['tasks']?.map((x) => Task.fromMap(x))),
       url: map['url'] ?? '',
       urlname: map['urlname'] ?? '',
       endDateTime: DateTime.fromMillisecondsSinceEpoch(map['endDateTime']),
     );
   }
 
-  String toJson() => json.encode(toMap());
-
-  factory TaskModel.fromJson(String source) =>
-      TaskModel.fromMap(json.decode(source));
-
   @override
   String toString() {
-    return 'TaskModel(id: $id, title: $title, description: $description, tasks: $tasks, url: $url, urlname: $urlname, endDateTime: $endDateTime)';
+    return 'TaskModel(id: $id, title: $title, description: $description, url: $url, urlname: $urlname, endDateTime: $endDateTime)';
   }
 
   @override
@@ -82,7 +71,6 @@ class TaskModel {
         other.id == id &&
         other.title == title &&
         other.description == description &&
-        listEquals(other.tasks, tasks) &&
         other.url == url &&
         other.urlname == urlname &&
         other.endDateTime == endDateTime;
@@ -93,7 +81,6 @@ class TaskModel {
     return id.hashCode ^
         title.hashCode ^
         description.hashCode ^
-        tasks.hashCode ^
         url.hashCode ^
         urlname.hashCode ^
         endDateTime.hashCode;
@@ -101,6 +88,7 @@ class TaskModel {
 }
 
 class Task {
+  String id;
   String title;
   String detail;
   String urlname;
@@ -108,6 +96,7 @@ class Task {
   String imageUrl;
   String imageName;
   Task({
+    required this.id,
     required this.title,
     required this.detail,
     required this.urlname,
@@ -117,6 +106,7 @@ class Task {
   });
 
   Task copyWith({
+    String? id,
     String? title,
     String? detail,
     String? urlname,
@@ -125,6 +115,7 @@ class Task {
     String? imageName,
   }) {
     return Task(
+      id: id ?? this.id,
       title: title ?? this.title,
       detail: detail ?? this.detail,
       urlname: urlname ?? this.urlname,
@@ -134,10 +125,9 @@ class Task {
     );
   }
 
-
-
   Map<String, dynamic> toMap() {
     return {
+      'id': id,
       'title': title,
       'detail': detail,
       'urlname': urlname,
@@ -147,8 +137,9 @@ class Task {
     };
   }
 
-  factory Task.fromMap(Map<String, dynamic> map) {
+  factory Task.fromMap(Map<String, dynamic> map, String id) {
     return Task(
+      id: id,
       title: map['title'] ?? '',
       detail: map['detail'] ?? '',
       urlname: map['urlname'] ?? '',
@@ -158,13 +149,9 @@ class Task {
     );
   }
 
-  String toJson() => json.encode(toMap());
-
-  factory Task.fromJson(String source) => Task.fromMap(json.decode(source));
-
   @override
   String toString() {
-    return 'Task(title: $title, detail: $detail, urlname: $urlname, url: $url, imageUrl: $imageUrl, imageName: $imageName)';
+    return 'Task(id: $id, title: $title, detail: $detail, urlname: $urlname, url: $url, imageUrl: $imageUrl, imageName: $imageName)';
   }
 
   @override
@@ -172,6 +159,7 @@ class Task {
     if (identical(this, other)) return true;
 
     return other is Task &&
+        other.id == id &&
         other.title == title &&
         other.detail == detail &&
         other.urlname == urlname &&
@@ -182,7 +170,8 @@ class Task {
 
   @override
   int get hashCode {
-    return title.hashCode ^
+    return id.hashCode ^
+        title.hashCode ^
         detail.hashCode ^
         urlname.hashCode ^
         url.hashCode ^
