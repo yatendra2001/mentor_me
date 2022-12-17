@@ -90,150 +90,7 @@ class _EventsScreenState extends State<EventsScreen> {
       builder: (context, state) {
         return Scaffold(
           key: scaffoldKey,
-          endDrawer: Drawer(
-            width: 70.w,
-            child: ListView(
-              // Important: Remove any padding from the ListView.
-              padding: EdgeInsets.zero,
-              children: [
-                DrawerHeader(
-                  decoration: BoxDecoration(
-                    color: kPrimaryBlackColor,
-                  ),
-                  child: Center(
-                      child: Text(
-                    'MentorMe',
-                    style: TextStyle(fontSize: 26.sp),
-                  )),
-                ),
-                ListTile(
-                  title: const Text("Switch Profile"),
-                  textColor: kPrimaryBlackColor,
-                  trailing: Transform.scale(
-                    scale: 0.6,
-                    child: RollingSwitch.icon(
-                      initialState: false,
-                      onChanged: (bool val) {
-                        // context
-                        //     .read<ProfileBloc>()
-                        //     .add(ProfileToUpdateUser(isPrivate: val));
-                        // String message = '';
-                        // setState(() {
-                        //   message =
-                        //       state.user.isPrivate ? "Public" : "Private";
-                        // });
-                        // flutterToast(msg: "Profile Updated: $message");
-                      },
-                      rollingInfoRight: RollingIconInfo(
-                        icon: Icons.lock,
-                        backgroundColor: kPrimaryBlackColor,
-                        text: Text(
-                          'User',
-                          style: TextStyle(
-                              fontSize: 12.sp,
-                              fontFamily: kFontFamily,
-                              color: kPrimaryWhiteColor),
-                        ),
-                      ),
-                      rollingInfoLeft: RollingIconInfo(
-                        icon: Icons.public,
-                        backgroundColor: Colors.grey,
-                        text: Text(
-                          'Mentor',
-                          style: TextStyle(
-                            fontSize: 12.sp,
-                            fontFamily: kFontFamily,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  onTap: () {
-                    // Update the state of the app
-                    // ...
-                    // Then close the drawer
-                    Navigator.pop(context);
-                  },
-                ),
-                ListTile(
-                  title: const Text('Logout'),
-                  textColor: kPrimaryBlackColor,
-                  trailing: IconButton(
-                    icon: SizedBox(
-                      height: 3.2.h,
-                      width: 3.2.h,
-                      child: CachedNetworkImage(
-                          imageUrl:
-                              "https://cdn-icons-png.flaticon.com/512/159/159707.png"),
-                    ),
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        barrierDismissible: true,
-                        builder: (context) => AlertDialog(
-                          backgroundColor: Colors.grey[50],
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                            side: const BorderSide(
-                                color: kPrimaryBlackColor, width: 2.0),
-                          ),
-                          title: Center(
-                            child: Text(
-                              "Are you sure you want to logout?",
-                              style: TextStyle(
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w400,
-                                color: kPrimaryBlackColor,
-                                fontFamily: kFontFamily,
-                              ),
-                            ),
-                          ),
-                          actions: [
-                            OutlinedButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: Text(
-                                  "No",
-                                  style: TextStyle(
-                                    color: kPrimaryBlackColor,
-                                    fontSize: 10.sp,
-                                    fontFamily: kFontFamily,
-                                  ),
-                                )),
-                            OutlinedButton(
-                              onPressed: () {
-                                context
-                                    .read<AuthBloc>()
-                                    .add(AuthLogoutRequested(context: context));
-                                context.read<LoginCubit>().logoutRequested();
-
-                                SessionHelperEmpty();
-                                MyApp.navigatorKey.currentState!
-                                    .pushReplacementNamed(
-                                        LoginPageView.routeName);
-                              },
-                              child: Text(
-                                "Yes",
-                                style: TextStyle(
-                                    color: kPrimaryBlackColor,
-                                    fontFamily: kFontFamily,
-                                    fontSize: 10.sp),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                  onTap: () {
-                    // Update the state of the app
-                    // ...
-                    // Then close the drawer
-                    Navigator.pop(context);
-                  },
-                ),
-              ],
-            ),
-          ),
+          endDrawer: _endDrawer(context),
           floatingActionButton: SpeedDial(
             icon: Icons.add,
             overlayColor: Colors.black,
@@ -325,6 +182,152 @@ class _EventsScreenState extends State<EventsScreen> {
     );
   }
 
+  Drawer _endDrawer(BuildContext context) {
+    return Drawer(
+      width: 70.w,
+      child: ListView(
+        // Important: Remove any padding from the ListView.
+        padding: EdgeInsets.zero,
+        children: [
+          DrawerHeader(
+            decoration: BoxDecoration(
+              color: kPrimaryBlackColor,
+            ),
+            child: Center(
+                child: Text(
+              'MentorMe',
+              style: TextStyle(fontSize: 26.sp),
+            )),
+          ),
+          ListTile(
+            title: const Text("Switch Profile"),
+            textColor: kPrimaryBlackColor,
+            trailing: Transform.scale(
+              scale: 0.6,
+              child: RollingSwitch.icon(
+                initialState: false,
+                onChanged: (bool val) {
+                  // context
+                  //     .read<ProfileBloc>()
+                  //     .add(ProfileToUpdateUser(isPrivate: val));
+                  // String message = '';
+                  // setState(() {
+                  //   message =
+                  //       state.user.isPrivate ? "Public" : "Private";
+                  // });
+                  // flutterToast(msg: "Profile Updated: $message");
+                },
+                rollingInfoRight: RollingIconInfo(
+                  icon: Icons.lock,
+                  backgroundColor: kPrimaryBlackColor,
+                  text: Text(
+                    'User',
+                    style: TextStyle(
+                        fontSize: 12.sp,
+                        fontFamily: kFontFamily,
+                        color: kPrimaryWhiteColor),
+                  ),
+                ),
+                rollingInfoLeft: RollingIconInfo(
+                  icon: Icons.public,
+                  backgroundColor: Colors.grey,
+                  text: Text(
+                    'Mentor',
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      fontFamily: kFontFamily,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            onTap: () {
+              // Update the state of the app
+              // ...
+              // Then close the drawer
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            title: const Text('Logout'),
+            textColor: kPrimaryBlackColor,
+            trailing: IconButton(
+              icon: SizedBox(
+                height: 3.2.h,
+                width: 3.2.h,
+                child: CachedNetworkImage(
+                    imageUrl:
+                        "https://cdn-icons-png.flaticon.com/512/159/159707.png"),
+              ),
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  barrierDismissible: true,
+                  builder: (context) => AlertDialog(
+                    backgroundColor: Colors.grey[50],
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      side: const BorderSide(
+                          color: kPrimaryBlackColor, width: 2.0),
+                    ),
+                    title: Center(
+                      child: Text(
+                        "Are you sure you want to logout?",
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w400,
+                          color: kPrimaryBlackColor,
+                          fontFamily: kFontFamily,
+                        ),
+                      ),
+                    ),
+                    actions: [
+                      OutlinedButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text(
+                            "No",
+                            style: TextStyle(
+                              color: kPrimaryBlackColor,
+                              fontSize: 10.sp,
+                              fontFamily: kFontFamily,
+                            ),
+                          )),
+                      OutlinedButton(
+                        onPressed: () {
+                          context
+                              .read<AuthBloc>()
+                              .add(AuthLogoutRequested(context: context));
+                          context.read<LoginCubit>().logoutRequested();
+
+                          SessionHelperEmpty();
+                          MyApp.navigatorKey.currentState!
+                              .pushReplacementNamed(LoginPageView.routeName);
+                        },
+                        child: Text(
+                          "Yes",
+                          style: TextStyle(
+                              color: kPrimaryBlackColor,
+                              fontFamily: kFontFamily,
+                              fontSize: 10.sp),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+            onTap: () {
+              // Update the state of the app
+              // ...
+              // Then close the drawer
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   _buildAppBar() {
     return SliverAppBar(
       backgroundColor: kPrimaryWhiteColor,
@@ -336,7 +339,7 @@ class _EventsScreenState extends State<EventsScreen> {
       elevation: 1,
       toolbarHeight: 8.h,
       title: Text(
-        "Events",
+        "MentorMe",
         style: TextStyle(
           color: Colors.black,
           fontWeight: FontWeight.bold,
@@ -347,7 +350,7 @@ class _EventsScreenState extends State<EventsScreen> {
       bottom: TabBar(indicatorColor: kPrimaryBlackColor, tabs: [
         Tab(
           child: Text(
-            "DashBoard",
+            "Dashboard",
             style: TextStyle(
               color: kPrimaryBlackColor,
               fontSize: 13.sp,
