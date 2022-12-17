@@ -4,6 +4,7 @@ import 'package:mentor_me/screens/screens.dart';
 
 import '../screens/events/event_room_screen.dart';
 import '../screens/events/event_room_task_screen.dart';
+import '../screens/stream_chat/ui/channel_screen.dart';
 import '../screens/stream_chat/ui/stream_chat_inbox.dart';
 
 class CustomRouter {
@@ -25,6 +26,10 @@ class CustomRouter {
         return LoginPageView.route();
       case EventsScreen.routeName:
         return EventsScreen.route();
+      case SearchScreen.routeName:
+        return SearchScreen.route(
+          args: settings.arguments as SearchScreenArgs,
+        );
       case CreateEventScreen.routeName:
         return CreateEventScreen.route();
       case EventRoomScreen.routeName:
@@ -35,6 +40,10 @@ class CustomRouter {
             args: settings.arguments as EventRoomTaskScreenArgs);
       case StreamChatInbox.routeName:
         return StreamChatInbox.route();
+      case ChannelScreen.routeName:
+        return ChannelScreen.route(
+          args: settings.arguments as ChannelScreenArgs,
+        );
       default:
         return _errorRoute();
     }

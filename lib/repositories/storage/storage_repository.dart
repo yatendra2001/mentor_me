@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
@@ -19,6 +20,7 @@ class StorageRepository extends BaseStorageRepository {
         .ref(ref)
         .putFile(image)
         .then((taskSnapshot) => taskSnapshot.ref.getDownloadURL());
+    log("url 1 :" + downloadUrl);
     return downloadUrl;
   }
 
@@ -39,6 +41,7 @@ class StorageRepository extends BaseStorageRepository {
       image: image,
       ref: 'images/users/userProfile_$imageId.jpg',
     );
+    log("url 2 :" + downloadUrl);
     return downloadUrl;
   }
 

@@ -21,7 +21,7 @@ class InitializeStreamChatCubit extends Cubit<InitializeStreamChatState> {
       var user = User(
         id: context.read<AuthBloc>().state.user?.uid ?? '',
         name: SessionHelper.username,
-        image: "",
+        image: SessionHelper.profileImageUrl,
         // extraData: {'publicKey': publicKey!},
       );
 

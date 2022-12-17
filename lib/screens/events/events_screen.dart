@@ -90,7 +90,7 @@ class _EventsScreenState extends State<EventsScreen> {
       builder: (context, state) {
         return Scaffold(
           key: scaffoldKey,
-          endDrawer: _endDrawer(context),
+          drawer: _drawer(context),
           floatingActionButton: SpeedDial(
             icon: Icons.add,
             overlayColor: Colors.black,
@@ -182,7 +182,7 @@ class _EventsScreenState extends State<EventsScreen> {
     );
   }
 
-  Drawer _endDrawer(BuildContext context) {
+  Drawer _drawer(BuildContext context) {
     return Drawer(
       width: 70.w,
       child: ListView(
@@ -334,10 +334,25 @@ class _EventsScreenState extends State<EventsScreen> {
       floating: true,
       snap: true,
       automaticallyImplyLeading: false,
-      centerTitle: false,
+      centerTitle: true,
       pinned: true,
       elevation: 1,
       toolbarHeight: 8.h,
+      leading: Padding(
+        padding: const EdgeInsets.only(left: 8.0),
+        child: GestureDetector(
+          onTap: () => scaffoldKey.currentState?.openDrawer(),
+          child: Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: SessionHelper.profileImageUrl != null
+                ? UserProfileImage(
+                    radius: 15.sp,
+                    profileImageUrl: SessionHelper.profileImageUrl!,
+                    iconRadius: 27.sp)
+                : Icon(FontAwesomeIcons.user),
+          ),
+        ),
+      ),
       title: Text(
         "MentorMe",
         style: TextStyle(
@@ -425,18 +440,6 @@ class _EventsScreenState extends State<EventsScreen> {
               ),
             );
           },
-        ),
-        GestureDetector(
-          onTap: () => scaffoldKey.currentState?.openEndDrawer(),
-          child: Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: SessionHelper.profileImageUrl != null
-                ? UserProfileImage(
-                    radius: 13.sp,
-                    profileImageUrl: SessionHelper.profileImageUrl!,
-                    iconRadius: 30.sp)
-                : Icon(FontAwesomeIcons.user),
-          ),
         ),
       ],
     );

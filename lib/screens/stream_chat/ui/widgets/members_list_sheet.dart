@@ -2,6 +2,8 @@ import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:mentor_me/widgets/user_profile_image.dart';
+import 'package:sizer/sizer.dart';
 import 'package:stream_chat/stream_chat.dart';
 import 'dart:io' show Platform;
 
@@ -36,14 +38,18 @@ class _MembersListSheetState extends State<MembersListSheet> {
                   height: 4,
                   margin: EdgeInsets.only(top: 8, bottom: 16),
                   decoration: BoxDecoration(
-                    color: kSecondaryYellowColor,
+                    color: kPrimaryBlackColor,
                     borderRadius: BorderRadius.circular(8),
                   ),
                 )),
-            const Align(
+            Align(
               alignment: Alignment.center,
               child: Text(
                 'Members',
+                style: Theme.of(context)
+                    .textTheme
+                    .headlineSmall!
+                    .copyWith(color: kPrimaryBlackColor),
               ),
             ),
             SizedBox(
@@ -59,20 +65,16 @@ class _MembersListSheetState extends State<MembersListSheet> {
                           itemCount: members.length,
                           itemBuilder: (context, index) {
                             return ListTile(
-                              leading: Container(
-                                height: 45,
-                                width: 45,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  image: DecorationImage(
-                                    image: NetworkImage(
-                                        members[index].user!.image!),
-                                  ),
-                                ),
-                              ),
+                              leading: UserProfileImage(
+                                  radius: 22.sp,
+                                  profileImageUrl: members[index].user!.image!,
+                                  iconRadius: 28.sp),
                               title: Text(
                                 members[index].user?.name ?? '',
-                                style: TextStyle(fontSize: 16),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge!
+                                    .copyWith(color: kPrimaryBlackColor),
                               ),
                             );
                           });

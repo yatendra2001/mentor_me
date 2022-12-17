@@ -52,7 +52,7 @@ class _GroupsInboxState extends State<GroupsInbox> {
             'members',
             [SessionHelper.uid!],
           ),
-          Filter.equal('chat_type', ChatType.group)
+          Filter.equal('chat_type', ChatType.event)
         ]),
         sort: [
           SortOption('last_message_at'),
