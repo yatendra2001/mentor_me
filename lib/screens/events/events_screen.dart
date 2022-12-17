@@ -1,9 +1,20 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:fluttericon/linecons_icons.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_stack/image_stack.dart';
+import 'package:mentor_me/blocs/blocs.dart';
+import 'package:mentor_me/main.dart';
+import 'package:mentor_me/screens/login/login_cubit/login_cubit.dart';
+import 'package:mentor_me/screens/screens.dart';
+import 'package:mentor_me/screens/stream_chat/cubit/initialize_stream_chat/initialize_stream_chat_cubit.dart';
+import 'package:mentor_me/screens/stream_chat/ui/stream_chat_inbox.dart';
+import 'package:mentor_me/widgets/user_profile_image.dart';
 import 'package:otp_text_field/otp_field.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:rolling_switch/rolling_switch.dart';
 import 'package:sizer/sizer.dart';
 import 'package:mentor_me/models/event_model.dart' as eve;
 
@@ -16,6 +27,7 @@ import 'package:mentor_me/utils/assets_constants.dart';
 import 'package:mentor_me/utils/session_helper.dart';
 import 'package:mentor_me/utils/theme_constants.dart';
 import 'package:mentor_me/widgets/flutter_toast.dart';
+import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
 import 'bloc/event_bloc.dart';
 
@@ -44,6 +56,7 @@ class _EventsScreenState extends State<EventsScreen> {
   final ScrollController _controller = ScrollController();
   String joinCode = "";
   late int totalCoins;
+  var scaffoldKey = GlobalKey<ScaffoldState>();
 
   _getWalletData() async {
     await UserRepository()
@@ -58,6 +71,15 @@ class _EventsScreenState extends State<EventsScreen> {
   @override
   void initState() {
     context.read<EventBloc>().add(GetUserEvent());
+    StreamChat.of(context)
+        .client
+        .on()
+        .where((Event event) => event.totalUnreadCount != null)
+        .listen((Event event) {
+      setState(() {
+        SessionHelper.totalUnreadMessagesCount = event.totalUnreadCount ?? 0;
+      });
+    });
     super.initState();
   }
 
@@ -67,6 +89,151 @@ class _EventsScreenState extends State<EventsScreen> {
     return BlocBuilder<EventBloc, EventState>(
       builder: (context, state) {
         return Scaffold(
+          key: scaffoldKey,
+          endDrawer: Drawer(
+            width: 70.w,
+            child: ListView(
+              // Important: Remove any padding from the ListView.
+              padding: EdgeInsets.zero,
+              children: [
+                DrawerHeader(
+                  decoration: BoxDecoration(
+                    color: kPrimaryBlackColor,
+                  ),
+                  child: Center(
+                      child: Text(
+                    'MentorMe',
+                    style: TextStyle(fontSize: 26.sp),
+                  )),
+                ),
+                ListTile(
+                  title: const Text("Switch Profile"),
+                  textColor: kPrimaryBlackColor,
+                  trailing: Transform.scale(
+                    scale: 0.6,
+                    child: RollingSwitch.icon(
+                      initialState: false,
+                      onChanged: (bool val) {
+                        // context
+                        //     .read<ProfileBloc>()
+                        //     .add(ProfileToUpdateUser(isPrivate: val));
+                        // String message = '';
+                        // setState(() {
+                        //   message =
+                        //       state.user.isPrivate ? "Public" : "Private";
+                        // });
+                        // flutterToast(msg: "Profile Updated: $message");
+                      },
+                      rollingInfoRight: RollingIconInfo(
+                        icon: Icons.lock,
+                        backgroundColor: kPrimaryBlackColor,
+                        text: Text(
+                          'User',
+                          style: TextStyle(
+                              fontSize: 12.sp,
+                              fontFamily: kFontFamily,
+                              color: kPrimaryWhiteColor),
+                        ),
+                      ),
+                      rollingInfoLeft: RollingIconInfo(
+                        icon: Icons.public,
+                        backgroundColor: Colors.grey,
+                        text: Text(
+                          'Mentor',
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            fontFamily: kFontFamily,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  onTap: () {
+                    // Update the state of the app
+                    // ...
+                    // Then close the drawer
+                    Navigator.pop(context);
+                  },
+                ),
+                ListTile(
+                  title: const Text('Logout'),
+                  textColor: kPrimaryBlackColor,
+                  trailing: IconButton(
+                    icon: SizedBox(
+                      height: 3.2.h,
+                      width: 3.2.h,
+                      child: CachedNetworkImage(
+                          imageUrl:
+                              "https://cdn-icons-png.flaticon.com/512/159/159707.png"),
+                    ),
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        barrierDismissible: true,
+                        builder: (context) => AlertDialog(
+                          backgroundColor: Colors.grey[50],
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                            side: const BorderSide(
+                                color: kPrimaryBlackColor, width: 2.0),
+                          ),
+                          title: Center(
+                            child: Text(
+                              "Are you sure you want to logout?",
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.w400,
+                                color: kPrimaryBlackColor,
+                                fontFamily: kFontFamily,
+                              ),
+                            ),
+                          ),
+                          actions: [
+                            OutlinedButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: Text(
+                                  "No",
+                                  style: TextStyle(
+                                    color: kPrimaryBlackColor,
+                                    fontSize: 10.sp,
+                                    fontFamily: kFontFamily,
+                                  ),
+                                )),
+                            OutlinedButton(
+                              onPressed: () {
+                                context
+                                    .read<AuthBloc>()
+                                    .add(AuthLogoutRequested(context: context));
+                                context.read<LoginCubit>().logoutRequested();
+
+                                SessionHelperEmpty();
+                                MyApp.navigatorKey.currentState!
+                                    .pushReplacementNamed(
+                                        LoginPageView.routeName);
+                              },
+                              child: Text(
+                                "Yes",
+                                style: TextStyle(
+                                    color: kPrimaryBlackColor,
+                                    fontFamily: kFontFamily,
+                                    fontSize: 10.sp),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                  onTap: () {
+                    // Update the state of the app
+                    // ...
+                    // Then close the drawer
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            ),
+          ),
           floatingActionButton: SpeedDial(
             icon: Icons.add,
             overlayColor: Colors.black,
@@ -202,29 +369,72 @@ class _EventsScreenState extends State<EventsScreen> {
         ),
       ]),
       actions: [
-        Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Container(
-              decoration: BoxDecoration(
-                  border: Border.all(color: kPrimaryBlackColor),
-                  borderRadius: BorderRadius.circular(8.0)),
-              child: Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: Row(
+        BlocBuilder<InitializeStreamChatCubit, InitializeStreamChatState>(
+          builder: (context, state) {
+            if (state is StreamChatInitializedState) {
+              return Padding(
+                padding: const EdgeInsets.only(right: 8, top: 4, bottom: 4),
+                child: Stack(
+                  alignment: Alignment.center,
                   children: [
-                    Text(
-                      totalCoins.toString(),
-                      style: TextStyle(
-                          color: kPrimaryBlackColor,
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.w500),
+                    if (SessionHelper.totalUnreadMessagesCount > 0)
+                      Positioned(
+                        top: 5,
+                        left: 5,
+                        child: Container(
+                          padding: const EdgeInsets.all(5),
+                          decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: kPrimaryBlackColor),
+                          child: Text(
+                            '${SessionHelper.totalUnreadMessagesCount}',
+                            style: TextStyle(
+                                color: kPrimaryWhiteColor,
+                                fontFamily: kFontFamily,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                      ),
+                    IconButton(
+                      icon: const Icon(
+                        Linecons.paper_plane,
+                        color: kPrimaryBlackColor,
+                      ),
+                      onPressed: () {
+                        Navigator.pushNamed(context, StreamChatInbox.routeName);
+                      },
                     ),
-                    Transform.scale(
-                        scale: 0.85, child: Image.asset(kTevoCoin2d)),
                   ],
                 ),
+              );
+            }
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: IconButton(
+                icon: const Icon(
+                  Linecons.paper_plane,
+                  color: kPrimaryBlackColor,
+                ),
+                onPressed: () {
+                  Navigator.pushNamed(context, StreamChatInbox.routeName);
+                },
               ),
-            ))
+            );
+          },
+        ),
+        GestureDetector(
+          onTap: () => scaffoldKey.currentState?.openEndDrawer(),
+          child: Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: SessionHelper.profileImageUrl != null
+                ? UserProfileImage(
+                    radius: 13.sp,
+                    profileImageUrl: SessionHelper.profileImageUrl!,
+                    iconRadius: 30.sp)
+                : Icon(FontAwesomeIcons.user),
+          ),
+        ),
       ],
     );
   }
