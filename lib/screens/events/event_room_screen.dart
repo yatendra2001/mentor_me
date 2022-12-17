@@ -9,6 +9,7 @@ import 'package:fluttericon/entypo_icons.dart';
 import 'package:fluttericon/linearicons_free_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_stack/image_stack.dart';
+import 'package:intl/intl.dart';
 import 'package:mentor_me/screens/events/leaderboard_screen.dart';
 import 'package:mentor_me/screens/events/event_task_des_screen.dart';
 import 'package:mentor_me/screens/stream_chat/models/chat_type.dart';
@@ -272,6 +273,7 @@ class _EventRoomScreenState extends State<EventRoomScreen> {
               .collection("events")
               .doc(widget.event.id)
               .collection("TaskPost")
+              .orderBy("endDateTime", descending: true)
               .get(),
           builder: (context, snapshot) {
             List<TaskModel> taskModels = snapshot.data!.docs
@@ -281,10 +283,12 @@ class _EventRoomScreenState extends State<EventRoomScreen> {
             if (snapshot.hasError == false && snapshot.hasData == true) {
               return Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16),
-                  child: Column(
-                    children: taskModels.map((model) {
-                      return buildPost(model) as Widget;
-                    }).toList(),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: taskModels.map((model) {
+                        return buildPost(model) as Widget;
+                      }).toList(),
+                    ),
                   ));
             }
             return Center(
@@ -329,12 +333,15 @@ class _EventRoomScreenState extends State<EventRoomScreen> {
                           SizedBox(
                             width: 1.w,
                           ),
-                          Text(
-                            "3:59:00  left",
-                            style: TextStyle(
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.grey),
+                          Flexible(
+                            child: Text(
+                              DateFormat("dd MMM hh:mm a")
+                                  .format(taskModel.endDateTime),
+                              style: TextStyle(
+                                  fontSize: 12.sp,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.grey),
+                            ),
                           )
                         ],
                       ),
@@ -351,7 +358,14 @@ class _EventRoomScreenState extends State<EventRoomScreen> {
                         height: 1.h,
                       ),
                       ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => EventTaskDesScreen(
+                              taskModel: taskModel,
+                              tasks: tasks,
+                            ),
+                          ));
+                        },
                         child: Text("Read More"),
                       ),
                       ElevatedButton(

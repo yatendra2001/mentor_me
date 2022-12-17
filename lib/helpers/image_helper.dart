@@ -10,14 +10,14 @@ class ImageHelper {
     required CropStyle cropStyle,
     required String title,
   }) async {
-    final pickedFile = await ImagePicker().getImage(
+    final pickedFile = await ImagePicker().pickImage(
       source: ImageSource.gallery,
       imageQuality: 95,
     );
     if (pickedFile != null) {
       final croppedFile = await ImageCropper().cropImage(
         sourcePath: pickedFile.path,
-        cropStyle: cropStyle,
+        cropStyle: CropStyle.rectangle,
         uiSettings: [
           AndroidUiSettings(
             toolbarTitle: title,
@@ -26,7 +26,6 @@ class ImageHelper {
             initAspectRatio: CropAspectRatioPreset.original,
             lockAspectRatio: false,
           ),
-          IOSUiSettings()
         ],
         compressQuality: 70,
       );

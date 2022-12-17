@@ -41,7 +41,6 @@ class StorageRepository extends BaseStorageRepository {
       image: image,
       ref: 'images/users/userProfile_$imageId.jpg',
     );
-    log("url 2 :" + downloadUrl);
     return downloadUrl;
   }
 
