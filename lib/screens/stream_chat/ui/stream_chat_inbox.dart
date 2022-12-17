@@ -4,13 +4,13 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:mentor_me/screens/screens.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:sizer/sizer.dart';
 import 'package:mentor_me/extensions/string_extension.dart';
 import 'package:mentor_me/repositories/user/user_repository.dart';
 import 'package:mentor_me/screens/stream_chat/cubit/initialize_stream_chat/initialize_stream_chat_cubit.dart';
 import 'package:mentor_me/screens/stream_chat/ui/widgets/dm_inbox.dart';
-import 'package:mentor_me/screens/stream_chat/ui/widgets/groups_inbox.dart';
 import 'package:mentor_me/utils/session_helper.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:mentor_me/utils/theme_constants.dart';
@@ -52,12 +52,12 @@ class _StreamChatInboxState extends State<StreamChatInbox> {
       floatingActionButton: FloatingActionButton(
           backgroundColor: kPrimaryBlackColor,
           onPressed: () {
-            // Navigator.of(context).pushNamed(SearchScreen.routeName,
-            //     arguments: SearchScreenArgs(type: SearchScreenType.message));
+            Navigator.of(context).pushNamed(SearchScreen.routeName,
+                arguments: SearchScreenArgs(type: SearchScreenType.message));
           },
           child: Icon(
-            Icons.add,
-            size: 30,
+            Icons.message,
+            size: 19.sp,
           )),
     );
   }

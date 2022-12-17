@@ -111,6 +111,7 @@ class _ChannelScreenState extends State<ChannelScreen> {
         channel: channel,
         child: Scaffold(
           appBar: ChannelHeader(
+            elevation: 0,
             showTypingIndicator: true,
             backgroundColor: Colors.white,
             title: Text(
@@ -164,6 +165,36 @@ class _ChannelScreenState extends State<ChannelScreen> {
                         iconRadius: 30.sp),
                   ),
                 ),
+              if (channel.extraData['chat_type'] != ChatType.oneOnOne)
+                SizedBox(
+                  width: 30,
+                  child: PopupMenuButton(
+                      padding: EdgeInsets.zero,
+                      onSelected: (index) {
+                        if (index == 0) {
+                          showModalBottomSheet(
+                              context: context,
+                              clipBehavior: Clip.antiAlias,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(32),
+                                      topRight: Radius.circular(32))),
+                              builder: (context) {
+                                return MembersListSheet(
+                                  channel: channel,
+                                );
+                              });
+                        }
+                      },
+                      itemBuilder: (context) {
+                        return [
+                          PopupMenuItem(
+                            value: 0,
+                            child: Text('Show Members'),
+                          )
+                        ];
+                      }),
+                )
             ],
           ),
           body: Column(

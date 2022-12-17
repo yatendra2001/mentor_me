@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +9,11 @@ import 'package:fluttericon/linearicons_free_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_stack/image_stack.dart';
 import 'package:mentor_me/screens/events/event_task_des_screen.dart';
+import 'package:mentor_me/screens/stream_chat/models/chat_type.dart';
+import 'package:mentor_me/screens/stream_chat/ui/channel_screen.dart';
 import 'package:mentor_me/screens/stream_chat/ui/widgets/groups_inbox.dart';
+import 'package:mentor_me/screens/stream_chat/ui/widgets/members_list_sheet.dart';
+import 'package:mentor_me/utils/session_helper.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:sizer/sizer.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
@@ -51,6 +57,28 @@ class EventRoomScreen extends StatefulWidget {
 
 class _EventRoomScreenState extends State<EventRoomScreen> {
   final ScrollController _controller = ScrollController();
+  late Channel channel;
+  Message? _quotedMessage;
+  @override
+  void initState() {
+    _setChannel();
+    super.initState();
+  }
+
+  _setChannel() async {
+    channel = StreamChat.of(context).client.channel(
+          'messaging',
+          extraData: {
+            'name': widget.event.eventName,
+            'members': [],
+            'chat_type': ChatType.event,
+          },
+          id: widget.event.id,
+        );
+    await channel.watch();
+    channel.addMembers([SessionHelper.uid!]);
+    // await channel.deleteReaction(, 'love');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,9 +93,79 @@ class _EventRoomScreenState extends State<EventRoomScreen> {
           },
           body: TabBarView(children: [
             _tasksList(context),
-            const GroupsInbox(),
+            _communityChatWidget(),
           ]),
         ),
+      ),
+    );
+  }
+
+  StreamChannel _communityChatWidget() {
+    return StreamChannel(
+      channel: channel,
+      child: Column(
+        children: <Widget>[
+          Expanded(
+            child: MessageListView(
+              // threadBuilder: (_, parentMessage) {
+              //   return ThreadPage();
+              // },
+              onMessageSwiped: (message) {
+                setState(() {
+                  _quotedMessage = message;
+                });
+              },
+              messageBuilder: (context, details, messages, defaultMessage) {
+                // Retrieving the message from details
+                final message = details.message;
+                return defaultMessage.copyWith(
+                    message: message,
+                    showFlagButton: true,
+                    showEditMessage: details.isMyMessage,
+                    showCopyMessage: true,
+                    showDeleteMessage: details.isMyMessage,
+                    showReplyMessage: true,
+                    showThreadReplyMessage: true,
+                    onReplyTap: (message) {
+                      setState(() {
+                        _quotedMessage = message;
+                      });
+                    });
+              },
+            ),
+          ),
+          MessageInput(
+            quotedMessage: _quotedMessage,
+            idleSendButton: const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: CircleAvatar(
+                backgroundColor: Colors.grey,
+                radius: 16,
+                child: Icon(
+                  Icons.arrow_forward,
+                  color: kPrimaryWhiteColor,
+                  size: 16,
+                ),
+              ),
+            ),
+            activeSendButton: const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: CircleAvatar(
+                radius: 16,
+                backgroundColor: Colors.black,
+                child: Icon(
+                  Icons.arrow_upward,
+                  size: 16,
+                  color: kPrimaryWhiteColor,
+                ),
+              ),
+            ),
+            onQuotedMessageCleared: () {
+              setState(() => _quotedMessage = null);
+            },
+            onMessageSent: (message) => log('Sending message: ${message.text}'),
+          ),
+        ],
       ),
     );
   }
@@ -113,6 +211,37 @@ class _EventRoomScreenState extends State<EventRoomScreen> {
           ),
         ),
       ]),
+      actions: [
+        SizedBox(
+          width: 30,
+          child: PopupMenuButton(
+              padding: EdgeInsets.zero,
+              onSelected: (index) {
+                if (index == 0) {
+                  showModalBottomSheet(
+                      context: context,
+                      clipBehavior: Clip.antiAlias,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(32),
+                              topRight: Radius.circular(32))),
+                      builder: (context) {
+                        return MembersListSheet(
+                          channel: channel,
+                        );
+                      });
+                }
+              },
+              itemBuilder: (context) {
+                return [
+                  PopupMenuItem(
+                    value: 0,
+                    child: Text('Show Members'),
+                  )
+                ];
+              }),
+        )
+      ],
     );
   }
 

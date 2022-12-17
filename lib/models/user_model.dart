@@ -70,7 +70,6 @@ class User extends Equatable {
     return {
       'id': id,
       'username': username,
-      'username_lower': username.toLowerCase(),
       'displayName': displayName,
       'age': age,
       'phone': phone,
