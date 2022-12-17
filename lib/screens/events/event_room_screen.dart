@@ -9,6 +9,7 @@ import 'package:fluttericon/entypo_icons.dart';
 import 'package:fluttericon/linearicons_free_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_stack/image_stack.dart';
+import 'package:mentor_me/screens/events/leaderboard_screen.dart';
 import 'package:mentor_me/utils/session_helper.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:sizer/sizer.dart';
@@ -226,7 +227,16 @@ class _EventRoomScreenState extends State<EventRoomScreen> {
                         child: Text("Read More"),
                       ),
                       ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => LeaderBoardScreen(
+                                taskMode: taskModel,
+                                task: tasks,
+                              ),
+                            ),
+                          );
+                        },
                         child: Text("View Analytics"),
                       ),
                     ],
@@ -294,7 +304,29 @@ class _BuildTaskState extends State<BuildTask> {
                 .doc(widget.task.id)
                 .collection("completed")
                 .doc(SessionHelper.uid)
-                .set({}).then((value) {
+                .set({}).then((value) async {
+              var doc = await FirebaseFirestore.instance
+                  .collection("Tasks")
+                  .doc(widget.modelId)
+                  .collection("leaderboard")
+                  .doc(SessionHelper.uid)
+                  .get();
+              if (doc.exists) {
+                await FirebaseFirestore.instance
+                    .collection("Tasks")
+                    .doc(widget.modelId)
+                    .collection("leaderboard")
+                    .doc(SessionHelper.uid)
+                    .update({'points': FieldValue.increment(10)});
+              } else {
+                await FirebaseFirestore.instance
+                    .collection("Tasks")
+                    .doc(widget.modelId)
+                    .collection("leaderboard")
+                    .doc(SessionHelper.uid)
+                    .set({'points': 10});
+              }
+            }).then((value) {
               isCompleted = !isCompleted;
               setState(() {});
             });
@@ -307,9 +339,16 @@ class _BuildTaskState extends State<BuildTask> {
                 .collection("completed")
                 .doc(SessionHelper.uid)
                 .delete()
-                .then((value) {
-              isCompleted = !isCompleted;
-              setState(() {});
+                .then((value) async {
+              await FirebaseFirestore.instance
+                  .collection("Tasks")
+                  .doc(widget.modelId)
+                  .collection("leaderboard")
+                  .doc(SessionHelper.uid)
+                  .set({"points": FieldValue.increment(-10)}).then((value) {
+                isCompleted = !isCompleted;
+                setState(() {});
+              });
             });
           }
         },
