@@ -4,6 +4,7 @@ import 'package:mentor_me/screens/screens.dart';
 
 import '../screens/events/event_room_screen.dart';
 import '../screens/events/event_room_task_screen.dart';
+import '../screens/stream_chat/ui/stream_chat_inbox.dart';
 
 class CustomRouter {
   static Route onGenerateRoute(RouteSettings settings) {
@@ -32,6 +33,8 @@ class CustomRouter {
       case EventRoomTaskScreen.routeName:
         return EventRoomTaskScreen.route(
             args: settings.arguments as EventRoomTaskScreenArgs);
+      case StreamChatInbox.routeName:
+        return StreamChatInbox.route();
       default:
         return _errorRoute();
     }

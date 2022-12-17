@@ -14,6 +14,8 @@ import 'package:mentor_me/utils/session_helper.dart';
 import 'key.dart';
 import 'package:sizer/sizer.dart';
 
+import 'screens/stream_chat/cubit/initialize_stream_chat/initialize_stream_chat_cubit.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -30,7 +32,7 @@ class MyApp extends StatelessWidget {
   MyApp({Key? key}) : super(key: key);
 
   final client = StreamChatClient(
-    streamChatApiKeyProd,
+    streamChatApiKey,
     logLevel: Level.INFO,
   );
 
@@ -61,6 +63,9 @@ class MyApp extends StatelessWidget {
             create: (context) => LoginCubit(
                 authRepository: context.read<AuthRepository>(),
                 userRepository: context.read<UserRepository>()),
+          ),
+          BlocProvider(
+            create: (context) => InitializeStreamChatCubit(),
           ),
         ],
         child: Sizer(

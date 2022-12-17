@@ -7,6 +7,7 @@ import 'package:fluttericon/linearicons_free_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_stack/image_stack.dart';
 import 'package:mentor_me/screens/events/event_task_des_screen.dart';
+import 'package:mentor_me/screens/stream_chat/ui/widgets/groups_inbox.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:sizer/sizer.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
@@ -49,8 +50,73 @@ class EventRoomScreen extends StatefulWidget {
 }
 
 class _EventRoomScreenState extends State<EventRoomScreen> {
+  final ScrollController _controller = ScrollController();
+
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      body: DefaultTabController(
+        length: 2,
+        child: NestedScrollView(
+          controller: _controller,
+          clipBehavior: Clip.none,
+          headerSliverBuilder: (_, __) {
+            return [_buildAppBar()];
+          },
+          body: TabBarView(children: [
+            _tasksList(context),
+            const GroupsInbox(),
+          ]),
+        ),
+      ),
+    );
+  }
+
+  _buildAppBar() {
+    return SliverAppBar(
+      backgroundColor: kPrimaryWhiteColor,
+      floating: true,
+      snap: true,
+      automaticallyImplyLeading: true,
+      centerTitle: false,
+      pinned: true,
+      elevation: 1,
+      toolbarHeight: 8.h,
+      title: Text(
+        widget.event.eventName,
+        style: TextStyle(
+          fontSize: 16.sp,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      bottom: TabBar(indicatorColor: kPrimaryBlackColor, tabs: [
+        Tab(
+          child: Text(
+            "Assigned Tasks",
+            style: TextStyle(
+              color: kPrimaryBlackColor,
+              fontSize: 11.sp,
+              fontFamily: kFontFamily,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+        Tab(
+          child: Text(
+            "Community Chat",
+            style: TextStyle(
+              color: kPrimaryBlackColor,
+              fontSize: 11.sp,
+              fontFamily: kFontFamily,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+      ]),
+    );
+  }
+
+  Widget _tasksList(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -67,27 +133,11 @@ class _EventRoomScreenState extends State<EventRoomScreen> {
           color: Colors.white,
         ),
       ),
-      appBar: AppBar(
-        elevation: 0,
-        leading: IconButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          icon: Icon(Icons.arrow_back_ios_new_outlined),
-        ),
-        title: Text(
-          widget.event.eventName,
-          style: TextStyle(
-            fontSize: 20.sp,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 16),
         child: Column(
           children: [
-            appBottomRow(),
+            // appBottomRow(),
             SizedBox(
               height: 4.h,
             ),
