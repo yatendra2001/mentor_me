@@ -5,8 +5,8 @@ customAppbar(String title) {
     title: Text(
       title,
     ),
-    automaticallyImplyLeading: false,
-    leading: BackButton(),
+    automaticallyImplyLeading: true,
+    // leading: BackButton(),
     elevation: 0,
     centerTitle: false,
   );

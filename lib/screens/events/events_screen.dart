@@ -475,13 +475,14 @@ class _EventsScreenState extends State<EventsScreen> {
         child: CircularProgressIndicator(),
       );
     }
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: SingleChildScrollView(
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             Text(
-              "You can now create your own events or participate in the ongoing event to win your boons and get your reward ! Click on the ‘+’ to create an event...",
+              "You can now create your own paid events to provide mentorship or participate in the ongoing event to get mentored. Click on the ‘+’ to create or join an event...",
+
               style: TextStyle(
                 fontSize: 9.sp,
                 color: kPrimaryBlackColor.withOpacity(0.4),
@@ -519,6 +520,8 @@ class _EventsScreenState extends State<EventsScreen> {
                         ],
                       ),
                       ListView.builder(
+                        physics: NeverScrollableScrollPhysics(),
+
                         padding: const EdgeInsets.only(top: 16),
                         shrinkWrap: true,
                         itemBuilder: ((context, index) => Padding(

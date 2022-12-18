@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:intl/intl.dart';
+import 'package:mentor_me/screens/login/widgets/standard_elevated_button.dart';
 import 'package:mentor_me/widgets/widgets.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:sizer/sizer.dart';
@@ -35,7 +36,8 @@ class EventRoomTaskScreen extends StatefulWidget {
   static Route route({required EventRoomTaskScreenArgs args}) {
     return PageTransition(
       settings: const RouteSettings(name: routeName),
-      type: PageTransitionType.rightToLeft,
+      type: PageTransitionType.bottomToTop,
+      duration: Duration(milliseconds: 500),
       child: EventRoomTaskScreen(eventId: args.eventId),
     );
   }
@@ -92,66 +94,6 @@ class _EventRoomTaskScreenState extends State<EventRoomTaskScreen> {
         return FocusScope.of(context).unfocus();
       },
       child: Scaffold(
-        appBar: AppBar(
-          elevation: 0,
-          leading: IconButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            icon: Icon(Icons.arrow_back_ios_new_outlined),
-          ),
-          title: Text(
-            "Create Task",
-            style: TextStyle(
-              fontSize: 20.sp,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          actions: [
-            ElevatedButton(
-                onPressed: () async {
-                  if (_formKey.currentState!.validate()) {
-                    for (var task in tasks) {
-                      if (task.title.isEmpty) {
-                        flutterToast(msg: "Task title cannot be left empty.");
-                        return;
-                      }
-                    }
-                    isSubmitting = true;
-                    setState(() {});
-                    TaskModel taskModel = TaskModel(
-                      id: null,
-                      title: titleController.text,
-                      description: descriptionController.text,
-                      url: urlController.text,
-                      urlname: urlnameController.text,
-                      endDateTime: DateTime.now(),
-                    );
-                    await FirebaseFirestore.instance
-                        .collection("events")
-                        .doc(widget.eventId)
-                        .collection("TaskPost")
-                        .add(taskModel.toMap())
-                        .then((value) async {
-                      await fun(value).then((value) {
-                        isSubmitting = false;
-
-                        setState(() {});
-
-                        Navigator.of(context).pop();
-                      });
-                    });
-                  }
-
-                  ;
-                },
-                child: isSubmitting
-                    ? Center(
-                        child: CircularProgressIndicator(),
-                      )
-                    : Text("Save"))
-          ],
-        ),
         body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -160,12 +102,81 @@ class _EventRoomTaskScreenState extends State<EventRoomTaskScreen> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
+                    Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () => Navigator.of(context).pop(),
+                          child: Text(
+                            "Cancel",
+                            style: TextStyle(
+                                color: kPrimaryBlackColor, fontSize: 12.sp),
+                          ),
+                        ),
+                        Spacer(),
+                        Text(
+                          "CREATE TASKS",
+                          style: TextStyle(
+                              color: kPrimaryBlackColor,
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w600),
+                        ),
+                        Spacer(),
+                        isSubmitting == false
+                            ? GestureDetector(
+                                onTap: () async {
+                                  if (_formKey.currentState!.validate()) {
+                                    for (var task in tasks) {
+                                      if (task.title.isEmpty) {
+                                        flutterToast(
+                                            msg:
+                                                "Task title cannot be left empty.");
+                                        return;
+                                      }
+                                    }
+                                    isSubmitting = true;
+                                    setState(() {});
+                                    TaskModel taskModel = TaskModel(
+                                      id: null,
+                                      title: titleController.text,
+                                      description: descriptionController.text,
+                                      url: urlController.text,
+                                      urlname: urlnameController.text,
+                                      endDateTime: DateTime.now(),
+                                    );
+                                    await FirebaseFirestore.instance
+                                        .collection("events")
+                                        .doc(widget.eventId)
+                                        .collection("TaskPost")
+                                        .add(taskModel.toMap())
+                                        .then((value) async {
+                                      await fun(value).then((value) {
+                                        isSubmitting = false;
+
+                                        setState(() {});
+
+                                        Navigator.of(context).pop();
+                                      });
+                                    });
+                                  }
+
+                                  ;
+                                },
+                                child: Text("Save",
+                                    style: TextStyle(
+                                        color: kPrimaryBlackColor,
+                                        fontSize: 12.sp)),
+                              )
+                            : CircularProgressIndicator()
+                      ],
+                    ),
                     Container(
-                      padding: EdgeInsets.all(8),
-                      margin: EdgeInsets.all(4),
                       decoration: BoxDecoration(
-                        border: Border.all(width: 1, color: Colors.black),
+                        color: kPrimaryWhiteColor,
+                        border: Border.all(color: kPrimaryBlackColor),
+                        borderRadius: BorderRadius.circular(8),
                       ),
+                      margin: EdgeInsets.only(top: 32),
+                      padding: EdgeInsets.all(8),
                       child: TextFormField(
                         controller: titleController,
                         decoration: InputDecoration(
@@ -186,11 +197,16 @@ class _EventRoomTaskScreenState extends State<EventRoomTaskScreen> {
                       height: 1.h,
                     ),
                     Container(
-                      padding: EdgeInsets.all(8),
-                      margin: EdgeInsets.all(4),
                       decoration: BoxDecoration(
-                        border: Border.all(width: 1, color: Colors.black),
+                        color: kPrimaryWhiteColor,
+                        border: Border.all(color: kPrimaryBlackColor),
+                        borderRadius: BorderRadius.circular(8),
                       ),
+                      width: double.infinity,
+                      margin: EdgeInsets.only(
+                        top: 16,
+                      ),
+                      padding: EdgeInsets.symmetric(horizontal: 16),
                       child: TextFormField(
                         controller: descriptionController,
                         maxLines: 5,
@@ -213,11 +229,13 @@ class _EventRoomTaskScreenState extends State<EventRoomTaskScreen> {
                       height: 1.h,
                     ),
                     Container(
-                      padding: EdgeInsets.all(8),
-                      margin: EdgeInsets.all(4),
                       decoration: BoxDecoration(
-                        border: Border.all(width: 1, color: Colors.black),
+                        color: kPrimaryWhiteColor,
+                        border: Border.all(color: kPrimaryBlackColor),
+                        borderRadius: BorderRadius.circular(8),
                       ),
+                      margin: EdgeInsets.only(top: 16),
+                      padding: EdgeInsets.all(16),
                       child: TextFormField(
                         controller: urlnameController,
                         decoration: InputDecoration(
@@ -232,11 +250,13 @@ class _EventRoomTaskScreenState extends State<EventRoomTaskScreen> {
                       height: 1.h,
                     ),
                     Container(
-                      padding: EdgeInsets.all(8),
-                      margin: EdgeInsets.all(4),
                       decoration: BoxDecoration(
-                        border: Border.all(width: 1, color: Colors.black),
+                        color: kPrimaryWhiteColor,
+                        border: Border.all(color: kPrimaryBlackColor),
+                        borderRadius: BorderRadius.circular(8),
                       ),
+                      margin: EdgeInsets.only(top: 16),
+                      padding: EdgeInsets.all(16),
                       child: TextFormField(
                         controller: urlController,
                         decoration: InputDecoration(
@@ -255,11 +275,13 @@ class _EventRoomTaskScreenState extends State<EventRoomTaskScreen> {
                         _selectEndDate(context);
                       },
                       child: Container(
-                        padding: EdgeInsets.all(8),
-                        margin: EdgeInsets.all(4),
                         decoration: BoxDecoration(
-                          border: Border.all(width: 1, color: Colors.black),
+                          color: kPrimaryWhiteColor,
+                          border: Border.all(color: kPrimaryBlackColor),
+                          borderRadius: BorderRadius.circular(8),
                         ),
+                        margin: EdgeInsets.only(top: 16),
+                        padding: EdgeInsets.all(16),
                         child: Row(
                           children: [
                             Text(
@@ -307,14 +329,14 @@ class _EventRoomTaskScreenState extends State<EventRoomTaskScreen> {
                       },
                       itemCount: tasks.length,
                     ),
-                    ElevatedButton(
-                      onPressed: () {
+                    StandardElevatedButton(
+                      onTap: () {
                         tasks.add(
                           empty(),
                         );
                         setState(() {});
                       },
-                      child: Text("Add Task"),
+                      labelText: "Add Tasks",
                     )
                   ],
                 ),
@@ -382,15 +404,24 @@ class _BuildTaskCardState extends State<BuildTaskCard> {
         Container(
           padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
           margin: EdgeInsets.all(8),
-          decoration:
-              BoxDecoration(border: Border.all(color: Colors.black, width: 2)),
+          decoration: BoxDecoration(
+            color: kPrimaryWhiteColor,
+            border: Border.all(color: kPrimaryBlackColor),
+            borderRadius: BorderRadius.circular(8),
+          ),
           child: Form(
             key: _formKey,
             child: Column(
               children: [
                 TextFormField(
                   controller: titleController,
-                  decoration: InputDecoration(hintText: "Title"),
+                  decoration: InputDecoration(
+                    labelText: "Title",
+                    labelStyle: Theme.of(context)
+                        .textTheme
+                        .labelLarge!
+                        .copyWith(color: kPrimaryBlackColor),
+                  ),
                   onChanged: (value) {
                     tasks[widget.index] =
                         tasks[widget.index].copyWith(title: value);
@@ -405,7 +436,13 @@ class _BuildTaskCardState extends State<BuildTaskCard> {
                     tasks[widget.index] =
                         tasks[widget.index].copyWith(detail: value);
                   },
-                  decoration: InputDecoration(hintText: "Detail"),
+                  decoration: InputDecoration(
+                    labelText: "Detail",
+                    labelStyle: Theme.of(context)
+                        .textTheme
+                        .labelLarge!
+                        .copyWith(color: kPrimaryBlackColor),
+                  ),
                 ),
                 SizedBox(
                   height: 2.h,
@@ -416,7 +453,13 @@ class _BuildTaskCardState extends State<BuildTaskCard> {
                     tasks[widget.index] =
                         tasks[widget.index].copyWith(urlname: value);
                   },
-                  decoration: InputDecoration(hintText: "UrlName"),
+                  decoration: InputDecoration(
+                    labelText: "UrlName",
+                    labelStyle: Theme.of(context)
+                        .textTheme
+                        .labelLarge!
+                        .copyWith(color: kPrimaryBlackColor),
+                  ),
                 ),
                 SizedBox(
                   height: 2.h,
@@ -427,7 +470,13 @@ class _BuildTaskCardState extends State<BuildTaskCard> {
                     tasks[widget.index] =
                         tasks[widget.index].copyWith(url: value);
                   },
-                  decoration: InputDecoration(hintText: "Url"),
+                  decoration: InputDecoration(
+                    labelText: "Url",
+                    labelStyle: Theme.of(context)
+                        .textTheme
+                        .labelLarge!
+                        .copyWith(color: kPrimaryBlackColor),
+                  ),
                 ),
                 SizedBox(
                   height: 2.h,
@@ -439,7 +488,13 @@ class _BuildTaskCardState extends State<BuildTaskCard> {
                         tasks[widget.index].copyWith(imageName: value);
                     ;
                   },
-                  decoration: InputDecoration(hintText: "ImageName"),
+                  decoration: InputDecoration(
+                    labelText: "ImageName",
+                    labelStyle: Theme.of(context)
+                        .textTheme
+                        .labelLarge!
+                        .copyWith(color: kPrimaryBlackColor),
+                  ),
                 ),
                 SizedBox(
                   height: 2.h,
@@ -455,6 +510,10 @@ class _BuildTaskCardState extends State<BuildTaskCard> {
                       hintText: tasks[widget.index].imageUrl == ''
                           ? 'Upload Image'
                           : tasks[widget.index].imageUrl,
+                      hintStyle: Theme.of(context)
+                          .textTheme
+                          .labelLarge!
+                          .copyWith(color: kPrimaryBlackColor),
                       suffixIcon: Icon(Icons.upload),
                     ),
                     readOnly: true,
