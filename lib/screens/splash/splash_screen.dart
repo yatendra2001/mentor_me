@@ -22,6 +22,10 @@ class SplashScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    log(DateTime.now()
+        .add(Duration(days: 1))
+        .millisecondsSinceEpoch
+        .toString());
     return WillPopScope(
         onWillPop: () async => false,
         child: BlocListener<AuthBloc, AuthState>(

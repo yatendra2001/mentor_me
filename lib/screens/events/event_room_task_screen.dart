@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_cropper/image_cropper.dart';
+import 'package:intl/intl.dart';
 import 'package:mentor_me/widgets/widgets.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:sizer/sizer.dart';
@@ -71,6 +72,7 @@ class _EventRoomTaskScreenState extends State<EventRoomTaskScreen> {
   final urlController = TextEditingController();
   final urlnameController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  DateTime endDate = DateTime.now().add(Duration(days: 1));
   bool isSubmitting = false;
 
   Future<void> fun(DocumentReference ref) async {
@@ -248,18 +250,34 @@ class _EventRoomTaskScreenState extends State<EventRoomTaskScreen> {
                     SizedBox(
                       height: 1.h,
                     ),
-                    Container(
-                      padding: EdgeInsets.all(8),
-                      margin: EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        border: Border.all(width: 1, color: Colors.black),
-                      ),
-                      child: TextFormField(
-                        decoration: InputDecoration(
-                          hintText: "EndDateTime",
-                          hintStyle: TextStyle(
-                              fontSize: 14.sp, fontWeight: FontWeight.w400),
-                          border: InputBorder.none,
+                    GestureDetector(
+                      onTap: () {
+                        _selectEndDate(context);
+                      },
+                      child: Container(
+                        padding: EdgeInsets.all(8),
+                        margin: EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          border: Border.all(width: 1, color: Colors.black),
+                        ),
+                        child: Row(
+                          children: [
+                            Text(
+                              "End Date",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 11.sp,
+                                  color: kPrimaryBlackColor),
+                            ),
+                            Spacer(),
+                            Text(
+                              DateFormat().format(endDate),
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 11.sp,
+                                  color: kPrimaryBlackColor.withOpacity(0.7)),
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -307,6 +325,20 @@ class _EventRoomTaskScreenState extends State<EventRoomTaskScreen> {
       ),
     );
   }
+
+  Future _selectEndDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now().add(Duration(days: 1)),
+      initialDatePickerMode: DatePickerMode.day,
+      firstDate: DateTime.now().add(Duration(days: 1)),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null) {
+      endDate = picked;
+      setState(() {});
+    }
+  }
 }
 
 class BuildTaskCard extends StatefulWidget {
@@ -325,10 +357,12 @@ class BuildTaskCard extends StatefulWidget {
 class _BuildTaskCardState extends State<BuildTaskCard> {
   final titleController = TextEditingController();
   final detailController = TextEditingController();
+
   final urlNameController = TextEditingController();
   final urlController = TextEditingController();
   final imageNameController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+
   @override
   void initState() {
     super.initState();
@@ -410,26 +444,38 @@ class _BuildTaskCardState extends State<BuildTaskCard> {
                 SizedBox(
                   height: 2.h,
                 ),
-                TextFormField(
-                  decoration:
-                      InputDecoration(hintText: tasks[widget.index].imageUrl),
-                  readOnly: true,
-                  onTap: () async {
-                    final pickedFile = await ImageHelper.pickImageFromGallery(
-                      context: context,
-                      cropStyle: CropStyle.circle,
-                      title: 'Task Image',
-                    );
-                    if (pickedFile != null) {
-                      final imageurl =
-                          await StorageRepository().uploadProfileImage(
-                        url: '',
-                        image: pickedFile,
+                Container(
+                  margin: EdgeInsets.all(4),
+                  padding: EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                      border: Border.all(width: 1, color: Colors.black)),
+                  child: TextFormField(
+                    decoration: InputDecoration(
+                      border: InputBorder.none,
+                      hintText: tasks[widget.index].imageUrl == ''
+                          ? 'Upload Image'
+                          : tasks[widget.index].imageUrl,
+                      suffixIcon: Icon(Icons.upload),
+                    ),
+                    readOnly: true,
+                    onTap: () async {
+                      final pickedFile = await ImageHelper.pickImageFromGallery(
+                        context: context,
+                        cropStyle: CropStyle.circle,
+                        title: 'Task Image',
                       );
-                      tasks[widget.index].copyWith(imageUrl: imageurl);
-                      setState(() {});
-                    }
-                  },
+                      if (pickedFile != null) {
+                        final imageurl =
+                            await StorageRepository().uploadProfileImage(
+                          url: '',
+                          image: pickedFile,
+                        );
+                        tasks[widget.index] =
+                            tasks[widget.index].copyWith(imageUrl: imageurl);
+                        setState(() {});
+                      }
+                    },
+                  ),
                 )
               ],
             ),

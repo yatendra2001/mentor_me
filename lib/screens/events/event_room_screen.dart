@@ -9,6 +9,7 @@ import 'package:fluttericon/entypo_icons.dart';
 import 'package:fluttericon/linearicons_free_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_stack/image_stack.dart';
+import 'package:intl/intl.dart';
 import 'package:mentor_me/screens/events/leaderboard_screen.dart';
 import 'package:mentor_me/screens/events/event_task_des_screen.dart';
 import 'package:mentor_me/screens/stream_chat/models/chat_type.dart';
@@ -272,19 +273,21 @@ class _EventRoomScreenState extends State<EventRoomScreen> {
               .collection("events")
               .doc(widget.event.id)
               .collection("TaskPost")
+              .orderBy("endDateTime", descending: true)
               .get(),
           builder: (context, snapshot) {
-            List<TaskModel> taskModels = snapshot.data!.docs
-                .map((task) => TaskModel.fromMap(task.data(), task.id))
-                .toList();
-
             if (snapshot.hasError == false && snapshot.hasData == true) {
+              List<TaskModel> taskModels = snapshot.data!.docs
+                  .map((task) => TaskModel.fromMap(task.data(), task.id))
+                  .toList();
               return Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16),
-                  child: Column(
-                    children: taskModels.map((model) {
-                      return buildPost(model) as Widget;
-                    }).toList(),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: taskModels.map((model) {
+                        return buildPost(model) as Widget;
+                      }).toList(),
+                    ),
                   ));
             }
             return Center(
@@ -296,6 +299,7 @@ class _EventRoomScreenState extends State<EventRoomScreen> {
 
   buildPost(TaskModel taskModel) {
     if (taskModel.id != null) {
+      bool open = (taskModel.endDateTime.isAfter(DateTime.now()));
       return FutureBuilder(
           future: FirebaseFirestore.instance
               .collection("Tasks")
@@ -303,10 +307,10 @@ class _EventRoomScreenState extends State<EventRoomScreen> {
               .collection("Assigned Tasks")
               .get(),
           builder: (context, snapshot) {
-            List<Task> tasks = snapshot.data!.docs
-                .map((task) => Task.fromMap(task.data(), task.id))
-                .toList();
             if (snapshot.hasError == false && snapshot.hasData == true) {
+              List<Task> tasks = snapshot.data!.docs
+                  .map((task) => Task.fromMap(task.data(), task.id))
+                  .toList();
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 child: Container(
@@ -330,7 +334,8 @@ class _EventRoomScreenState extends State<EventRoomScreen> {
                             width: 1.w,
                           ),
                           Text(
-                            "3:59:00  left",
+                            DateFormat("dd MMM\nhh:mm a")
+                                .format(taskModel.endDateTime),
                             style: TextStyle(
                                 fontSize: 12.sp,
                                 fontWeight: FontWeight.w700,
@@ -338,9 +343,13 @@ class _EventRoomScreenState extends State<EventRoomScreen> {
                           )
                         ],
                       ),
-                      SizedBox(
-                        height: 3.h,
-                      ),
+                      Align(
+                          alignment: Alignment.topLeft,
+                          child: Chip(
+                            backgroundColor:
+                                open ? Colors.green.withOpacity(0.3) : null,
+                            label: Text(open ? "open" : "closed"),
+                          )),
                       Column(
                         children: tasks.map((task) {
                           return BuildTask(task: task, modelId: taskModel.id!)
@@ -351,10 +360,19 @@ class _EventRoomScreenState extends State<EventRoomScreen> {
                         height: 1.h,
                       ),
                       ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => EventTaskDesScreen(
+                              taskModel: taskModel,
+                              tasks: tasks,
+                            ),
+                          ));
+                        },
                         child: Text("Read More"),
                       ),
                       ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red),
                         onPressed: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(
@@ -372,9 +390,7 @@ class _EventRoomScreenState extends State<EventRoomScreen> {
                 ),
               );
             }
-            return Center(
-              child: CircularProgressIndicator(),
-            );
+            return SizedBox.shrink();
           });
     }
   }
