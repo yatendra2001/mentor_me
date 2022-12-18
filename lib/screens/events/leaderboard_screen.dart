@@ -1,8 +1,12 @@
-import 'dart:developer';
+import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:image_stack/image_stack.dart';
+import 'package:mentor_me/screens/events/mentee_completed_list.dart';
+import 'package:mentor_me/utils/assets_constants.dart';
+import 'package:mentor_me/utils/theme_constants.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
@@ -39,39 +43,68 @@ class _LeaderBoardScreenState extends State<LeaderBoardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         elevation: 0,
-        leading: IconButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          icon: Icon(Icons.arrow_back_ios_new_outlined),
-        ),
+        automaticallyImplyLeading: true,
         title: Text(
-          "LeaderBoard",
+          "Analytics",
           style: TextStyle(
-            fontSize: 20.sp,
+            fontSize: 18.sp,
             fontWeight: FontWeight.w600,
           ),
         ),
       ),
-      body: Column(
-        children: [
-          Column(
-            children:
-                members.map((member) => buildTile(member) as Widget).toList(),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                height: 1.h,
+              ),
+              Text(
+                "LeaderBoard 👑",
+                style: TextStyle(
+                  fontSize: 15.sp,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              SizedBox(
+                height: 2.h,
+              ),
+              Column(
+                children: members
+                    .map((member) => Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: buildTile(member) as Widget,
+                        ))
+                    .toList(),
+              ),
+              SizedBox(
+                height: 4.h,
+              ),
+              Text(
+                "Peers Who Completed",
+                style: TextStyle(
+                  fontSize: 15.sp,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              SizedBox(
+                height: 2.h,
+              ),
+              Column(
+                children: widget.task
+                    .map((task) => BuildTaskCard(
+                          task: task,
+                          taskModelId: widget.taskMode.id!,
+                        ))
+                    .toList(),
+              )
+            ],
           ),
-          SizedBox(
-            height: 4.h,
-          ),
-          Column(
-            children: widget.task
-                .map((task) => BuildTaskCard(
-                      task: task,
-                      taskModelId: widget.taskMode.id!,
-                    ))
-                .toList(),
-          )
-        ],
+        ),
       ),
     );
   }
@@ -80,7 +113,8 @@ class _LeaderBoardScreenState extends State<LeaderBoardScreen> {
     User? user = mp.keys.first;
     int point = mp.values.first;
     return ListTile(
-      tileColor: members[0] == mp ? Colors.yellow[100] : Colors.white,
+      tileColor: members[0] == mp ? Colors.green[100] : Colors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       leading: UserProfileImage(
           radius: 20, profileImageUrl: user.profileImageUrl, iconRadius: 40),
       title: Text(user.displayName),
@@ -108,7 +142,7 @@ class _LeaderBoardScreenState extends State<LeaderBoardScreen> {
         members.sort(
           (a, b) => a.values.first.compareTo(a.values.first),
         );
-        log(members.toString());
+        // log(members.toString());
         setState(() {});
       });
     });
@@ -130,6 +164,7 @@ class BuildTaskCard extends StatefulWidget {
 
 class _BuildTaskCardState extends State<BuildTaskCard> {
   List<User> users = [];
+  List<String> images = [];
 
   @override
   void initState() {
@@ -140,19 +175,79 @@ class _BuildTaskCardState extends State<BuildTaskCard> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.symmetric(vertical: 16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          
-          Text(
-            widget.task.title,
-            style: TextStyle(fontSize: 18.sp),
+          GestureDetector(
+            onTap: () {
+              showModalBottomSheet(
+                  context: context,
+                  clipBehavior: Clip.antiAlias,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(32),
+                          topRight: Radius.circular(32))),
+                  builder: (context) {
+                    return MenteeCompletedBotomSheet(
+                      mentees: users,
+                    );
+                  });
+              // Navigator.of(context).pushNamed(EventRoomScreen.routeName,
+              //     arguments: EventRoomScreenArgs(event: event));
+            },
+            child: Card(
+              elevation: 1,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+                side: BorderSide(color: kPrimaryBlackColor),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          widget.task.title,
+                          style: TextStyle(
+                              color: kPrimaryBlackColor,
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w500),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16.0),
+                    Text(
+                      "Completed By",
+                      style: TextStyle(
+                          color: kPrimaryBlackColor.withOpacity(0.5),
+                          fontSize: 11.sp,
+                          fontWeight: FontWeight.w400),
+                    ),
+                    const SizedBox(height: 16.0),
+                    ImageStack(
+                      imageList: images,
+                      totalCount: images.length,
+                      imageRadius: 22.sp,
+                      imageCount: 3,
+                      imageBorderWidth: 0,
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
-          Column(
-            children:
-                users.map((user) => buildTasktile(user) as Widget).toList(),
-          )
+          // Text(
+          //   widget.task.title,
+          //   style: TextStyle(fontSize: 18.sp),
+          // ),
+          // Column(
+          //   children:
+          //       users.map((user) => buildTasktile(user) as Widget).toList(),
+          // )
         ],
       ),
     );
@@ -180,5 +275,10 @@ class _BuildTaskCardState extends State<BuildTaskCard> {
         setState(() {});
       }
     });
+    for (var user in users) {
+      images.add(user.profileImageUrl.isNotEmpty
+          ? user.profileImageUrl
+          : avatarImageList[Random().nextInt(3)]);
+    }
   }
 }

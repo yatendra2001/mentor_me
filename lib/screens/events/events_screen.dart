@@ -475,100 +475,106 @@ class _EventsScreenState extends State<EventsScreen> {
         child: CircularProgressIndicator(),
       );
     }
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        children: [
-          Text(
-            "You can now create your own events or participate in the ongoing event to win your boons and get your reward ! Click on the ‘+’ to create an event...",
-            style: TextStyle(
-              fontSize: 9.sp,
-              color: kPrimaryBlackColor.withOpacity(0.4),
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Text(
+              "You can now create your own paid events to provide mentorship or participate in the ongoing event to get mentored. Click on the ‘+’ to create or join an event...",
+              style: TextStyle(
+                fontSize: 9.sp,
+                color: kPrimaryBlackColor.withOpacity(0.4),
+              ),
+              textAlign: TextAlign.justify,
             ),
-            textAlign: TextAlign.justify,
-          ),
-          state.events == null || state.events!.isEmpty
-              ? Container()
-              : Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      height: 32,
-                    ),
-                    Row(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Text(
-                            'Ongoing Event',
-                            style: TextStyle(
-                                fontSize: 18.sp, fontWeight: FontWeight.w500),
-                          ),
-                        ),
-                        Spacer(),
-                        IconButton(
-                            onPressed: () {
-                              setState(() {
-                                hideOngoingEvent = !hideOngoingEvent;
-                              });
-                            },
-                            icon: Icon(Icons.arrow_drop_down))
-                      ],
-                    ),
-                    ListView.builder(
-                      padding: const EdgeInsets.only(top: 16),
-                      shrinkWrap: true,
-                      itemBuilder: ((context, index) => Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: EventCardWidget(
-                              images: images,
-                              event: onGoingEvent[index],
+            state.events == null || state.events!.isEmpty
+                ? Container()
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        height: 32,
+                      ),
+                      Row(
+                        children: [
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Text(
+                              'Ongoing Event',
+                              style: TextStyle(
+                                  fontSize: 18.sp, fontWeight: FontWeight.w500),
                             ),
-                          )),
-                      itemCount: onGoingEvent.length,
-                    ),
-                    SizedBox(
-                      height: 32,
-                    ),
-                    Row(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Text(
-                            'Upcoming Event',
-                            style: TextStyle(
-                                fontSize: 18.sp, fontWeight: FontWeight.w500),
                           ),
-                        ),
-                        Spacer(),
-                        IconButton(
-                            onPressed: () {
-                              setState(() {
-                                hideUpComingEvent = !hideUpComingEvent;
-                              });
-                            },
-                            icon: Icon(Icons.arrow_drop_down))
-                      ],
-                    ),
-                    !hideUpComingEvent
-                        ? ListView.builder(
-                            padding: const EdgeInsets.only(top: 16),
-                            shrinkWrap: true,
-                            itemBuilder: ((context, index) => Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 8.0),
-                                  child: EventCardWidget(
-                                    images: images,
-                                    event: upComingEvent[index],
-                                  ),
-                                )),
-                            itemCount: upComingEvent.length,
-                          )
-                        : SizedBox.shrink(),
-                  ],
-                )
-        ],
+                          Spacer(),
+                          IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  hideOngoingEvent = !hideOngoingEvent;
+                                });
+                              },
+                              icon: Icon(Icons.arrow_drop_down))
+                        ],
+                      ),
+                      ListView.builder(
+                        physics: NeverScrollableScrollPhysics(),
+                        padding: const EdgeInsets.only(top: 16),
+                        shrinkWrap: true,
+                        itemBuilder: ((context, index) => Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 8.0),
+                              child: EventCardWidget(
+                                images: images,
+                                event: onGoingEvent[index],
+                              ),
+                            )),
+                        itemCount: onGoingEvent.length,
+                      ),
+                      SizedBox(
+                        height: 32,
+                      ),
+                      Row(
+                        children: [
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Text(
+                              'Upcoming Event',
+                              style: TextStyle(
+                                  fontSize: 18.sp, fontWeight: FontWeight.w500),
+                            ),
+                          ),
+                          Spacer(),
+                          IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  hideUpComingEvent = !hideUpComingEvent;
+                                });
+                              },
+                              icon: Icon(Icons.arrow_drop_down))
+                        ],
+                      ),
+                      !hideUpComingEvent
+                          ? ListView.builder(
+                              padding: const EdgeInsets.only(top: 16),
+                              shrinkWrap: true,
+                              itemBuilder: ((context, index) => Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 8.0),
+                                    child: EventCardWidget(
+                                      images: images,
+                                      event: upComingEvent[index],
+                                    ),
+                                  )),
+                              itemCount: upComingEvent.length,
+                            )
+                          : SizedBox.shrink(),
+                    ],
+                  )
+          ],
+        ),
       ),
     );
   }

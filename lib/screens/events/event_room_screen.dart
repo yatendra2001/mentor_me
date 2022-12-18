@@ -12,6 +12,7 @@ import 'package:image_stack/image_stack.dart';
 import 'package:intl/intl.dart';
 import 'package:mentor_me/screens/events/leaderboard_screen.dart';
 import 'package:mentor_me/screens/events/event_task_des_screen.dart';
+import 'package:mentor_me/screens/login/widgets/standard_elevated_button.dart';
 import 'package:mentor_me/screens/stream_chat/models/chat_type.dart';
 import 'package:mentor_me/screens/stream_chat/ui/channel_screen.dart';
 import 'package:mentor_me/screens/stream_chat/ui/widgets/groups_inbox.dart';
@@ -81,8 +82,9 @@ class _EventRoomScreenState extends State<EventRoomScreen> {
           },
           id: widget.event.id,
         );
-    await channel.watch();
+    log(SessionHelper.uid!);
     channel.addMembers([SessionHelper.uid!]);
+    await channel.watch();
     // await channel.deleteReaction(, 'love');
   }
 
@@ -268,32 +270,33 @@ class _EventRoomScreenState extends State<EventRoomScreen> {
           color: Colors.white,
         ),
       ),
-      body: FutureBuilder(
-          future: FirebaseFirestore.instance
-              .collection("events")
-              .doc(widget.event.id)
-              .collection("TaskPost")
-              .orderBy("endDateTime", descending: true)
-              .get(),
-          builder: (context, snapshot) {
-            if (snapshot.hasError == false && snapshot.hasData == true) {
-              List<TaskModel> taskModels = snapshot.data!.docs
-                  .map((task) => TaskModel.fromMap(task.data(), task.id))
-                  .toList();
-              return Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: taskModels.map((model) {
-                        return buildPost(model) as Widget;
-                      }).toList(),
-                    ),
-                  ));
-            }
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          }),
+      body: SingleChildScrollView(
+        child: FutureBuilder(
+            future: FirebaseFirestore.instance
+                .collection("events")
+                .doc(widget.event.id)
+                .collection("TaskPost")
+                .orderBy("endDateTime", descending: true)
+                .get(),
+            builder: (context, snapshot) {
+              if (snapshot.hasError == false && snapshot.hasData == true) {
+                List<TaskModel> taskModels = snapshot.data!.docs
+                    .map((task) => TaskModel.fromMap(task.data(), task.id))
+                    .toList();
+                return Column(
+                  children: taskModels.map((model) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: buildPost(model) as Widget,
+                    );
+                  }).toList(),
+                );
+              }
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            }),
+      ),
     );
   }
 
@@ -311,81 +314,90 @@ class _EventRoomScreenState extends State<EventRoomScreen> {
               List<Task> tasks = snapshot.data!.docs
                   .map((task) => Task.fromMap(task.data(), task.id))
                   .toList();
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                child: Container(
-                  padding: EdgeInsets.all(16),
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                      border: Border.all(width: 2, color: Colors.black)),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            "#${taskModel.title}",
-                            style: TextStyle(
-                                fontSize: 16.sp, fontWeight: FontWeight.w600),
-                          ),
-                          Spacer(),
-                          Icon(Icons.alarm),
-                          SizedBox(
-                            width: 1.w,
-                          ),
-                          Text(
-                            DateFormat("dd MMM\nhh:mm a")
-                                .format(taskModel.endDateTime),
-                            style: TextStyle(
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.grey),
-                          )
-                        ],
-                      ),
-                      Align(
-                          alignment: Alignment.topLeft,
-                          child: Chip(
-                            backgroundColor:
-                                open ? Colors.green.withOpacity(0.3) : null,
-                            label: Text(open ? "open" : "closed"),
-                          )),
-                      Column(
-                        children: tasks.map((task) {
-                          return BuildTask(task: task, modelId: taskModel.id!)
-                              as Widget;
-                        }).toList(),
-                      ),
-                      SizedBox(
-                        height: 1.h,
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => EventTaskDesScreen(
-                              taskModel: taskModel,
-                              tasks: tasks,
+              return Card(
+                margin: const EdgeInsets.symmetric(vertical: 8),
+                color: kPrimaryWhiteColor,
+                elevation: 2,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  child: Container(
+                    padding: EdgeInsets.all(16),
+                    width: double.infinity,
+                    // decoration: BoxDecoration(
+                    //     border: Border.all(width: 2, color: Colors.black)),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              "#${taskModel.title}",
+                              style: TextStyle(
+                                  fontSize: 16.sp, fontWeight: FontWeight.w600),
                             ),
-                          ));
-                        },
-                        child: Text("Read More"),
-                      ),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red),
-                        onPressed: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => LeaderBoardScreen(
-                                taskMode: taskModel,
-                                task: tasks,
-                              ),
+                            Spacer(),
+                            Icon(Icons.alarm),
+                            SizedBox(
+                              width: 1.w,
                             ),
-                          );
-                        },
-                        child: Text("View Analytics"),
-                      ),
-                    ],
+                            Text(
+                              DateFormat("dd MMM - hh:mm a")
+                                  .format(taskModel.endDateTime),
+                              style: TextStyle(
+                                  fontSize: 12.sp,
+                                  fontWeight: FontWeight.w500,
+                                  color: kPrimaryBlackColor),
+                            )
+                          ],
+                        ),
+                        Align(
+                            alignment: Alignment.topLeft,
+                            child: Chip(
+                              backgroundColor:
+                                  open ? Colors.green.withOpacity(0.3) : null,
+                              label: Text(open ? "open" : "closed"),
+                            )),
+                        Column(
+                          children: tasks.map((task) {
+                            return BuildTask(task: task, modelId: taskModel.id!)
+                                as Widget;
+                          }).toList(),
+                        ),
+                        SizedBox(
+                          height: 1.h,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            StandardElevatedButton(
+                              onTap: () {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => EventTaskDesScreen(
+                                    taskModel: taskModel,
+                                    tasks: tasks,
+                                  ),
+                                ));
+                              },
+                              labelText: "Instructions",
+                            ),
+                            StandardElevatedButton(
+                              onTap: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) => LeaderBoardScreen(
+                                      taskMode: taskModel,
+                                      task: tasks,
+                                    ),
+                                  ),
+                                );
+                              },
+                              labelText: "Analytics",
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               );
@@ -435,10 +447,12 @@ class _BuildTaskState extends State<BuildTask> {
   Widget build(BuildContext context) {
     Task task = widget.task;
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 4),
-      decoration:
-          BoxDecoration(border: Border.all(width: 2, color: Colors.black45)),
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       child: ListTile(
+        shape: RoundedRectangleBorder(
+            side: const BorderSide(color: kPrimaryBlackColor),
+            borderRadius: BorderRadius.circular(8)),
         onTap: () async {
           if (!isCompleted) {
             await FirebaseFirestore.instance
@@ -497,8 +511,14 @@ class _BuildTaskState extends State<BuildTask> {
           }
         },
         leading: isCompleted
-            ? Icon(Icons.check_box)
-            : Icon(Icons.check_box_outline_blank),
+            ? Icon(
+                Icons.check_box,
+                color: Colors.green,
+              )
+            : Icon(
+                Icons.check_box_outline_blank,
+                color: kPrimaryBlackColor,
+              ),
         minLeadingWidth: 2,
         title: Text(task.title),
         tileColor: Colors.white,
@@ -506,225 +526,3 @@ class _BuildTaskState extends State<BuildTask> {
     );
   }
 }
-
-// class _EventRoomScreenState extends State<EventRoomScreen> {
-//   final ScrollController _controller = ScrollController();
-//   List<Map<String, dynamic>> ls = [];
-
-//   @override
-//   void initState() {
-//     getDataOfEvent();
-//     super.initState();
-//   }
-
-//   getDataOfEvent() async {
-//     final snap = await FirebaseFirestore.instance
-//         .collection("eventRoomFeed")
-//         .doc(widget.event.id)
-//         .collection("eventTasks")
-//         .orderBy("dateTime", descending: true)
-//         .get();
-//     for (var element in snap.docs) {
-//       ls.add(element.data());
-//     }
-//     setState(() {});
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return SafeArea(
-//       child: Scaffold(
-//         body: DefaultTabController(
-//           length: 2,
-//           child: NestedScrollView(
-//             controller: _controller,
-//             clipBehavior: Clip.none,
-//             headerSliverBuilder: (_, __) {
-//               return [_buildAppBar()];
-//             },
-//             body: TabBarView(
-//               children: [
-//                 _buildDashboardView(),
-//                 _buildLeaderBoard(),
-//               ],
-//             ),
-//           ),
-//         ),
-//         floatingActionButton: FloatingActionButton(
-//           onPressed: () {
-//             Navigator.of(context).pushNamed(
-//               EventRoomTaskScreen.routeName,
-//               arguments: EventRoomTaskScreenArgs(
-//                 eventId: widget.event.id!,
-//               ),
-//             );
-//           },
-//           backgroundColor: kPrimaryBlackColor,
-//           child: Icon(
-//             Icons.add,
-//             color: Colors.white,
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-
-//   _buildAppBar() {
-//     return SliverAppBar(
-//       backgroundColor: kPrimaryWhiteColor,
-//       floating: true,
-//       snap: true,
-//       automaticallyImplyLeading: true,
-//       centerTitle: false,
-//       pinned: true,
-//       elevation: 1,
-//       leading: IconButton(
-//         icon: const Icon(Icons.arrow_back_ios_new_outlined),
-//         onPressed: () {
-//           Navigator.of(context).pop();
-//         },
-//       ),
-//       toolbarHeight: 8.h,
-//       title: Text(
-//         widget.event.eventName,
-//         style: TextStyle(
-//           color: Colors.black,
-//           fontWeight: FontWeight.bold,
-//           fontFamily: kFontFamily,
-//           fontSize: 14.sp,
-//         ),
-//       ),
-//       bottom: TabBar(indicatorColor: kPrimaryBlackColor, tabs: [
-//         Tab(
-//           child: Text(
-//             "Assigned Tasks",
-//             style: TextStyle(
-//               color: kPrimaryBlackColor,
-//               fontSize: 12.sp,
-//               fontFamily: kFontFamily,
-//               fontWeight: FontWeight.w500,
-//             ),
-//           ),
-//         ),
-//         Tab(
-//           child: Text(
-//             "Members",
-//             style: TextStyle(
-//               color: kPrimaryBlackColor,
-//               fontSize: 12.sp,
-//               fontFamily: kFontFamily,
-//               fontWeight: FontWeight.w500,
-//             ),
-//           ),
-//         ),
-//       ]),
-//     );
-//   }
-
-//   List<String> images = [
-//     "https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8dXNlcnxlbnwwfHwwfHw%3D&w=1000&q=80",
-//     "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NHx8dXNlcnxlbnwwfHwwfHw%3D&w=1000&q=80",
-//     "https://wac-cdn.atlassian.com/dam/jcr:ba03a215-2f45-40f5-8540-b2015223c918/Max-R_Headshot%20(1).jpg?cdnVersion=487",
-//     "https://preview.keenthemes.com/metronic-v4/theme/assets/pages/media/profile/profile_user.jpg",
-//     "https://cxl.com/wp-content/uploads/2016/03/nate_munger.png"
-//   ];
-
-//   List<bool> isCompletedList = [
-//     false,
-//     false,
-//     false,
-//     false,
-//     false,
-//     false,
-//     false
-//   ];
-
-//   _buildDashboardView() {
-//     return ListView.builder(
-//       padding: EdgeInsets.only(top: 16),
-//       itemBuilder: (context, index) => Row(
-//         children: [
-//           Container(
-//             width: MediaQuery.of(context).size.width * 0.7,
-//             child: Column(
-//               crossAxisAlignment: CrossAxisAlignment.start,
-//               mainAxisAlignment: MainAxisAlignment.start,
-//               children: [
-//                 Text(
-//                   ls[index]["senderName"],
-//                   style:
-//                       TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w600),
-//                 ),
-//                 SizedBox(
-//                   height: 4,
-//                 ),
-//                 Text(
-//                   "${ls[index]['task']}",
-//                   style: TextStyle(
-//                     fontSize: 10.sp,
-//                     fontWeight: FontWeight.w400,
-//                   ),
-//                 ),
-//                 SizedBox(
-//                   height: 16,
-//                 ),
-//                 Image.network(ls[index]["image"]),
-//                 SizedBox(
-//                   height: 16,
-//                 ),
-//                 GestureDetector(
-//                   onTap: () async {
-//                     await launchURL(context, ls[index]["link"]);
-//                   },
-//                   child: Text(
-//                     ls[index]["link"],
-//                     style: TextStyle(
-//                       color: Colors.blue,
-//                       fontSize: 10.sp,
-//                       decoration: TextDecoration.underline,
-//                     ),
-//                   ),
-//                 )
-//               ],
-//             ),
-//             decoration: BoxDecoration(
-//               border: Border.all(color: kPrimaryBlackColor),
-//               color: kPrimaryWhiteColor,
-//             ),
-//             padding: EdgeInsets.only(left: 16, right: 16, top: 4, bottom: 16),
-//             margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-//           ),
-//           Row(
-//             children: [
-//               true
-//                   ? const Icon(LineariconsFree.checkmark_cicle,
-//                       size: 16, color: kPrimaryBlackColor)
-//                   : const Icon(Entypo.hourglass, color: kPrimaryBlackColor),
-//               SizedBox(
-//                 width: 8,
-//               ),
-//               Column(
-//                 children: [
-//                   Icon(
-//                     Icons.arrow_circle_up,
-//                     size: 36,
-//                   ),
-//                   SizedBox(
-//                     height: 4,
-//                   ),
-//                   Text('4 Votes')
-//                 ],
-//               ),
-//             ],
-//           ),
-//           Spacer()
-//         ],
-//       ),
-//       itemCount: ls.length,
-//     );
-//   }
-
-//   _buildLeaderBoard() {
-//     return Container();
-//   }
-// }
