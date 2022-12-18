@@ -45,12 +45,12 @@ class EventBloc extends Bloc<EventEvent, EventState> {
   Future<bool> directToPayment({required String joinCode}) async {
     final communityEvent = await _eventRepository.joinEvent(
         roomCode: joinCode, userId: SessionHelper.uid!);
+    flutterToast(msg: "Added");
+    add(const GetUserEvent());
     if (communityEvent != null) {
       if (communityEvent.paid == true) {
         return true;
       } else {
-        flutterToast(msg: "Added");
-        add(const GetUserEvent());
         return false;
       }
     }

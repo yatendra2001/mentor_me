@@ -3,8 +3,10 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:http/http.dart' as http;
+
 import 'package:mentor_me/config/paths.dart';
 import 'package:mentor_me/utils/session_helper.dart';
 
@@ -13,10 +15,12 @@ import '../events/bloc/event_bloc.dart';
 
 class PaymentPage extends StatefulWidget {
   final String JoinCode;
+  final Function() onTap;
 
   const PaymentPage({
     Key? key,
     required this.JoinCode,
+    required this.onTap,
   }) : super(key: key);
 
   @override
@@ -25,8 +29,10 @@ class PaymentPage extends StatefulWidget {
 
 class _PaymentPageState extends State<PaymentPage> {
   Event? cur;
+  BuildContext? ctx;
   @override
   void initState() {
+    ctx = context;
     fun();
     super.initState();
   }
@@ -67,23 +73,16 @@ class _PaymentPageState extends State<PaymentPage> {
             .then((value) async {
           await Stripe.instance.presentPaymentSheet().then((value) async {
             log("hi");
-            await context
-                .read<EventBloc>()
-                .directToPayment(joinCode: widget.JoinCode);
-
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                  content: Text('Congrats !You have joined the grp')),
-            );
           });
         });
       } catch (e) {
         if (e is StripeException) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Sorry! Payment Failed'),
+              content: Text('Note : Payment Done In Test Mode'),
             ),
           );
+          Navigator.of(context).pop();
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Error: $e')),

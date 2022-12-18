@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mentor_me/config/paths.dart';
 import 'package:mentor_me/models/event_model.dart';
 import 'package:mentor_me/repositories/event/base_event_repository.dart';
+import 'package:mentor_me/utils/session_helper.dart';
 
 class EventRepository extends BaseEventRepository {
   final FirebaseFirestore _firebaseFirestore;
@@ -27,7 +28,9 @@ class EventRepository extends BaseEventRepository {
   Future<void> createEvent({required Event event}) async {
     final refId =
         await _firebaseFirestore.collection(Paths.events).add(event.toMap());
-    await myEvents(event: event, refId: refId);
+    await myEvents(event: event, refId: refId).then((value) async {
+      await joinEvent(roomCode: event.roomCode, userId: SessionHelper.uid!);
+    });
   }
 
   Future<List<Event>> getUserEvents({required String userId}) async {

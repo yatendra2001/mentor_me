@@ -140,7 +140,7 @@ class _LeaderBoardScreenState extends State<LeaderBoardScreen> {
         .then((value) {
       loadUser(value).then((value) {
         members.sort(
-          (a, b) => a.values.first.compareTo(a.values.first),
+          (a, b) => b.values.first.compareTo(a.values.first),
         );
         // log(members.toString());
         setState(() {});

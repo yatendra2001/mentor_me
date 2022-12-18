@@ -104,7 +104,11 @@ class _EventsScreenState extends State<EventsScreen> {
                 labelStyle: TextStyle(fontSize: 11.sp),
                 backgroundColor: kPrimaryBlackColor,
                 onTap: () {
-                  Navigator.of(context).pushNamed(CreateEventScreen.routeName);
+                  Navigator.of(context)
+                      .pushNamed(CreateEventScreen.routeName)
+                      .then((value) {
+                    context.read<EventBloc>().add(GetUserEvent());
+                  });
                 },
               ),
               SpeedDialChild(
@@ -136,8 +140,21 @@ class _EventsScreenState extends State<EventsScreen> {
                             } else {
                               Navigator.of(context)
                                   .push(MaterialPageRoute(builder: (context) {
-                                return PaymentPage(JoinCode: joinCode);
-                              }));
+                                return PaymentPage(
+                                    JoinCode: joinCode, onTap: () async {});
+                              })).then((value) async {
+                                await context
+                                    .read<EventBloc>()
+                                    .directToPayment(joinCode: joinCode)
+                                    .then((value) {
+                                  context.read<EventBloc>().add(GetUserEvent());
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content: Text(
+                                            'Congrats !You have joined the grp')),
+                                  );
+                                });
+                              });
                             }
                           },
                           child: const Text(
@@ -482,7 +499,6 @@ class _EventsScreenState extends State<EventsScreen> {
           children: [
             Text(
               "You can now create your own paid events to provide mentorship or participate in the ongoing event to get mentored. Click on the ‘+’ to create or join an event...",
-
               style: TextStyle(
                 fontSize: 9.sp,
                 color: kPrimaryBlackColor.withOpacity(0.4),
@@ -521,7 +537,6 @@ class _EventsScreenState extends State<EventsScreen> {
                       ),
                       ListView.builder(
                         physics: NeverScrollableScrollPhysics(),
-
                         padding: const EdgeInsets.only(top: 16),
                         shrinkWrap: true,
                         itemBuilder: ((context, index) => Padding(
