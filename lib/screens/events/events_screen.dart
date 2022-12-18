@@ -8,6 +8,7 @@ import 'package:image_stack/image_stack.dart';
 import 'package:mentor_me/blocs/blocs.dart';
 import 'package:mentor_me/main.dart';
 import 'package:mentor_me/screens/login/login_cubit/login_cubit.dart';
+import 'package:mentor_me/screens/payments/payment_page.dart';
 import 'package:mentor_me/screens/screens.dart';
 import 'package:mentor_me/screens/stream_chat/cubit/initialize_stream_chat/initialize_stream_chat_cubit.dart';
 import 'package:mentor_me/screens/stream_chat/ui/stream_chat_inbox.dart';
@@ -133,11 +134,10 @@ class _EventsScreenState extends State<EventsScreen> {
                             if (joinCode.length < 6) {
                               flutterToast(msg: "Please enter a 6 digit code");
                             } else {
-                              final check = await context
-                                  .read<EventBloc>()
-                                  .directToPayment(joinCode: joinCode)
-                                  .then((value) => Navigator.of(context)
-                                      .pushNamed(DirectToPayments.routeName));
+                              Navigator.of(context)
+                                  .push(MaterialPageRoute(builder: (context) {
+                                return PaymentPage(JoinCode: joinCode);
+                              }));
                             }
                           },
                           child: const Text(
@@ -477,98 +477,103 @@ class _EventsScreenState extends State<EventsScreen> {
     }
     return Padding(
       padding: const EdgeInsets.all(16.0),
-      child: Column(
-        children: [
-          Text(
-            "You can now create your own events or participate in the ongoing event to win your boons and get your reward ! Click on the ‘+’ to create an event...",
-            style: TextStyle(
-              fontSize: 9.sp,
-              color: kPrimaryBlackColor.withOpacity(0.4),
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            Text(
+              "You can now create your own events or participate in the ongoing event to win your boons and get your reward ! Click on the ‘+’ to create an event...",
+              style: TextStyle(
+                fontSize: 9.sp,
+                color: kPrimaryBlackColor.withOpacity(0.4),
+              ),
+              textAlign: TextAlign.justify,
             ),
-            textAlign: TextAlign.justify,
-          ),
-          state.events == null || state.events!.isEmpty
-              ? Container()
-              : Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      height: 32,
-                    ),
-                    Row(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Text(
-                            'Ongoing Event',
-                            style: TextStyle(
-                                fontSize: 18.sp, fontWeight: FontWeight.w500),
-                          ),
-                        ),
-                        Spacer(),
-                        IconButton(
-                            onPressed: () {
-                              setState(() {
-                                hideOngoingEvent = !hideOngoingEvent;
-                              });
-                            },
-                            icon: Icon(Icons.arrow_drop_down))
-                      ],
-                    ),
-                    ListView.builder(
-                      padding: const EdgeInsets.only(top: 16),
-                      shrinkWrap: true,
-                      itemBuilder: ((context, index) => Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: EventCardWidget(
-                              images: images,
-                              event: onGoingEvent[index],
+            state.events == null || state.events!.isEmpty
+                ? Container()
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        height: 32,
+                      ),
+                      Row(
+                        children: [
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Text(
+                              'Ongoing Event',
+                              style: TextStyle(
+                                  fontSize: 18.sp, fontWeight: FontWeight.w500),
                             ),
-                          )),
-                      itemCount: onGoingEvent.length,
-                    ),
-                    SizedBox(
-                      height: 32,
-                    ),
-                    Row(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Text(
-                            'Upcoming Event',
-                            style: TextStyle(
-                                fontSize: 18.sp, fontWeight: FontWeight.w500),
                           ),
-                        ),
-                        Spacer(),
-                        IconButton(
-                            onPressed: () {
-                              setState(() {
-                                hideUpComingEvent = !hideUpComingEvent;
-                              });
-                            },
-                            icon: Icon(Icons.arrow_drop_down))
-                      ],
-                    ),
-                    !hideUpComingEvent
-                        ? ListView.builder(
-                            padding: const EdgeInsets.only(top: 16),
-                            shrinkWrap: true,
-                            itemBuilder: ((context, index) => Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 8.0),
-                                  child: EventCardWidget(
-                                    images: images,
-                                    event: upComingEvent[index],
-                                  ),
-                                )),
-                            itemCount: upComingEvent.length,
-                          )
-                        : SizedBox.shrink(),
-                  ],
-                )
-        ],
+                          Spacer(),
+                          IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  hideOngoingEvent = !hideOngoingEvent;
+                                });
+                              },
+                              icon: Icon(Icons.arrow_drop_down))
+                        ],
+                      ),
+                      ListView.builder(
+                        padding: const EdgeInsets.only(top: 16),
+                        shrinkWrap: true,
+                        itemBuilder: ((context, index) => Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 8.0),
+                              child: EventCardWidget(
+                                images: images,
+                                event: onGoingEvent[index],
+                              ),
+                            )),
+                        itemCount: onGoingEvent.length,
+                      ),
+                      SizedBox(
+                        height: 32,
+                      ),
+                      Row(
+                        children: [
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Text(
+                              'Upcoming Event',
+                              style: TextStyle(
+                                  fontSize: 18.sp, fontWeight: FontWeight.w500),
+                            ),
+                          ),
+                          Spacer(),
+                          IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  hideUpComingEvent = !hideUpComingEvent;
+                                });
+                              },
+                              icon: Icon(Icons.arrow_drop_down))
+                        ],
+                      ),
+                      !hideUpComingEvent
+                          ? ListView.builder(
+                              padding: const EdgeInsets.only(top: 16),
+                              shrinkWrap: true,
+                              itemBuilder: ((context, index) => Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 8.0),
+                                    child: EventCardWidget(
+                                      images: images,
+                                      event: upComingEvent[index],
+                                    ),
+                                  )),
+                              itemCount: upComingEvent.length,
+                            )
+                          : SizedBox.shrink(),
+                    ],
+                  )
+          ],
+        ),
       ),
     );
   }

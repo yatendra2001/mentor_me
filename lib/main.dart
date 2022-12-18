@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:mentor_me/blocs/blocs.dart';
 import 'package:mentor_me/config/custom_router.dart';
@@ -19,6 +20,9 @@ import 'screens/stream_chat/cubit/initialize_stream_chat/initialize_stream_chat_
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  Stripe.publishableKey =
+      'pk_test_51MGH47SBsIkHMnZFx6rvm5YQAyhf2kpPY0uQMMHoOzYatk4jRlM7tdkUG2j2ehRBiBXfa3991t18uUD6B8ZqDi2I00UPhEP0aO';
+  await Stripe.instance.applySettings();
   EquatableConfig.stringify = kDebugMode;
   Bloc.observer = SimpleBlocObserver();
 
