@@ -8,6 +8,7 @@ import 'package:image_stack/image_stack.dart';
 import 'package:mentor_me/blocs/blocs.dart';
 import 'package:mentor_me/main.dart';
 import 'package:mentor_me/screens/login/login_cubit/login_cubit.dart';
+import 'package:mentor_me/screens/payments/payment_page.dart';
 import 'package:mentor_me/screens/screens.dart';
 import 'package:mentor_me/screens/stream_chat/cubit/initialize_stream_chat/initialize_stream_chat_cubit.dart';
 import 'package:mentor_me/screens/stream_chat/ui/stream_chat_inbox.dart';
@@ -133,11 +134,10 @@ class _EventsScreenState extends State<EventsScreen> {
                             if (joinCode.length < 6) {
                               flutterToast(msg: "Please enter a 6 digit code");
                             } else {
-                              final check = await context
-                                  .read<EventBloc>()
-                                  .directToPayment(joinCode: joinCode)
-                                  .then((value) => Navigator.of(context)
-                                      .pushNamed(DirectToPayments.routeName));
+                              Navigator.of(context)
+                                  .push(MaterialPageRoute(builder: (context) {
+                                return PaymentPage(JoinCode: joinCode);
+                              }));
                             }
                           },
                           child: const Text(
@@ -482,6 +482,7 @@ class _EventsScreenState extends State<EventsScreen> {
           children: [
             Text(
               "You can now create your own paid events to provide mentorship or participate in the ongoing event to get mentored. Click on the ‘+’ to create or join an event...",
+
               style: TextStyle(
                 fontSize: 9.sp,
                 color: kPrimaryBlackColor.withOpacity(0.4),
@@ -520,6 +521,7 @@ class _EventsScreenState extends State<EventsScreen> {
                       ),
                       ListView.builder(
                         physics: NeverScrollableScrollPhysics(),
+
                         padding: const EdgeInsets.only(top: 16),
                         shrinkWrap: true,
                         itemBuilder: ((context, index) => Padding(

@@ -66,6 +66,8 @@ dependencies:
   timelines: ^0.1.0
   provider: ^6.0.3
   connectivity_plus: ^2.3.6+1
+  http: ^0.13.5
+  flutter_stripe: ^7.0.0
 
 dev_dependencies:
   flutter_test:
